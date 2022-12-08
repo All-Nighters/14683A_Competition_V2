@@ -1,5 +1,4 @@
 #include "graphical_interface.h"
-#include "../../datas/constants.h"
 #include "main.h"
 #include <any>
 

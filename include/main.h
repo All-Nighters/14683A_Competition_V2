@@ -39,8 +39,24 @@
 /**
  * You should add more #includes here
  */
-//#include "okapi/api.hpp"
-//#include "pros/api_legacy.h"
+#include "okapi/api.hpp"
+#include "pros/api_legacy.h"
+
+// subsystems
+#include "subsystems/chassis/chassis.h"
+#include "subsystems/intake/intake.h"
+#include "subsystems/roller/roller.h"
+#include "subsystems/catapult/catapult.h"
+#include "subsystems/expansion/expansion.h"
+#include "subsystems/blocker/blocker.h"
+#include "../src/subsystems/graphical_interface/graphical_interface.h"
+
+// algorithms
+#include "algorithms/motion_profile/motion_profile.h"
+
+// data
+#include "data/constants.h"
+#include "data/configuration.h"
 
 /**
  * If you find doing pros::Motor() to be tedious and you'd prefer just to do
@@ -75,7 +91,7 @@ void opcontrol(void);
 /**
  * You can add C++-only headers here
  */
-//#include <iostream>
+#include <iostream>
 #endif
 
 #endif  // _PROS_MAIN_H_
