@@ -1,6 +1,8 @@
 #pragma once
 #include "main.h"
 
+
+using namespace okapi;
 namespace Constants {
 
 	namespace CatmullRom {
@@ -36,5 +38,21 @@ namespace Constants {
 		inline lv_color_t SELECTOR_BODY_BUTTON_BACKGROUND_RELEASED    = LV_COLOR_HEX(0x16A34A);
 		inline lv_color_t SELECTOR_BODY_BUTTON_BACKGROUND_PRESSED     = LV_COLOR_HEX(0x15803D);
 	}
+
+    namespace FIELD {
+        inline float fieldLength = 3.6576;
+
+        // high goal coordinates
+        inline float redHighGoalPosition_m[] = {0.45, 3.15, 0.76835};
+        inline float blueHighGoalPosition_m[] = {3.15, 0.45, 0.76835};
+        inline float redHighGoalPosition_percent[] = {14.54, 86, 20.99};
+        inline float blueHighGoalPosition_percent[] = {86, 14.54, 20.99};
+
+        // disk
+        inline QLength diskDiameter = 14_cm;
+        inline QMass diskMass = 0.06_kg;
+        inline float diskHorizontalArea = 0.015393804;
+        inline float diskVerticalArea = 0.0028;
+    }
 
 }
