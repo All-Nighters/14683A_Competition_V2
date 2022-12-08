@@ -40,19 +40,19 @@ namespace Constants {
 	}
 
     namespace FIELD {
-        inline float fieldLength = 3.6576;
+        inline float FIELD_LENGTH = 3.6576;
 
         // high goal coordinates
-        inline float redHighGoalPosition_m[] = {0.45, 3.15, 0.76835};
-        inline float blueHighGoalPosition_m[] = {3.15, 0.45, 0.76835};
-        inline float redHighGoalPosition_percent[] = {14.54, 86, 20.99};
-        inline float blueHighGoalPosition_percent[] = {86, 14.54, 20.99};
+        inline float RED_HIGH_GOAL_M[] = {0.45, 3.15, 0.76835};
+        inline float BLUE_HIGH_GOAL_M[] = {3.15, 0.45, 0.76835};
+        inline float RED_HIGH_GOAL_PCT[] = {14.54, 86, 20.99};
+        inline float BLUE_HIGH_GOAL_PCT[] = {86, 14.54, 20.99};
 
         // disk
-        inline QLength diskDiameter = 14_cm;
-        inline QMass diskMass = 0.06_kg;
-        inline float diskHorizontalArea = 0.015393804;
-        inline float diskVerticalArea = 0.0028;
+        inline QLength DISK_DIAMETER = 14_cm;
+        inline QMass DISK_MASS = 0.06_kg;
+        inline float DISK_HORIZONTAL_AREA = 0.015393804;
+        inline float DISK_VERTICAL_AREA = 0.0028;
     }
 
 }
