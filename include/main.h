@@ -42,6 +42,19 @@
 #include "okapi/api.hpp"
 #include "pros/api_legacy.h"
 
+
+// constants and configuration
+#include "data/constants.h"
+#include "data/configuration.h"
+
+// utilities
+#include "utilities/coordinates.h"
+#include "utilities/math_funcs.h"
+
+// algorithms
+#include "algorithms/odometry/odometry.h"
+#include "algorithms/motion_profile/motion_profile.h"
+
 // subsystems
 #include "subsystems/chassis/chassis.h"
 #include "subsystems/intake/intake.h"
@@ -50,13 +63,6 @@
 #include "subsystems/expansion/expansion.h"
 #include "subsystems/blocker/blocker.h"
 #include "../src/subsystems/graphical_interface/graphical_interface.h"
-
-// algorithms
-#include "algorithms/motion_profile/motion_profile.h"
-
-// data
-#include "data/constants.h"
-#include "data/configuration.h"
 
 /**
  * If you find doing pros::Motor() to be tedious and you'd prefer just to do
@@ -92,6 +98,7 @@ void opcontrol(void);
  * You can add C++-only headers here
  */
 #include <iostream>
+#include <math.h>
 #endif
 
 #endif  // _PROS_MAIN_H_
