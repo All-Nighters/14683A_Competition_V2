@@ -54,6 +54,4 @@ class Chassis {
         ADIEncoder* midTW;
         pros::IMU* imu1;
         pros::IMU* imu2;
-
-        Odom* odometry;
 };

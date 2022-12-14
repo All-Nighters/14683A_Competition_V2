@@ -203,14 +203,14 @@ void Chassis::turnAngle(float angle) {
  */
 
 void Chassis::faceAngle(float angle) {
-    RobotPosition robot_state = odometry->getState();
+    RobotPosition robot_state = Odom::getState();
     float target_angle = angle;
     float prev_error = formatAngle(target_angle) - formatAngle(robot_state.theta);
     float start_time = pros::millis();  
     float timeout = 10; // maximum runtime in seconds
 
     while (abs(formatAngle(target_angle) - formatAngle(robot_state.theta)) >= 0.5 && pros::millis() - start_time <= timeout*1000) {
-        robot_state = odometry->getState();
+        robot_state = Odom::getState();
 
         float error = formatAngle(target_angle) - formatAngle(robot_state.theta);
         float deriv_error = error - prev_error;

@@ -2,52 +2,45 @@
 #include "main.h"
 
 Odom::Odom() {
-    this->WHEEL_RADIUS = CONFIG::ROBOT_PARAMETERS::WHEEL_DIAMETER.convert(meter) / 2;
-    this->LTrackRadius = CONFIG::ROBOT_PARAMETERS::TRACK_LENGTH.convert(meter) / 2;
-    this->RTrackRadius = CONFIG::ROBOT_PARAMETERS::TRACK_LENGTH.convert(meter) / 2;
-    this->STrackRadius = CONFIG::ROBOT_PARAMETERS::MIDDLE_ENCODER_DISTANCE.convert(meter) / 2;
+    Odom::WHEEL_RADIUS = CONFIG::ROBOT_PARAMETERS::WHEEL_DIAMETER.convert(meter) / 2;
+    Odom::LTrackRadius = CONFIG::ROBOT_PARAMETERS::TRACK_LENGTH.convert(meter) / 2;
+    Odom::RTrackRadius = CONFIG::ROBOT_PARAMETERS::TRACK_LENGTH.convert(meter) / 2;
+    Odom::STrackRadius = CONFIG::ROBOT_PARAMETERS::MIDDLE_ENCODER_DISTANCE.convert(meter) / 2;
 
 
-    this->reset_variables();
+    Odom::reset_variables();
 
-    pros::Task loop(this->start_odom, this, "Odom");
+    pros::Task loop(Odom::position_tracking);
 }
 
 void Odom::reset_variables() {
-    this->LPos = 0;
-    this->RPos = 0;
-    this->SPos = 0;
+    Odom::LPos = 0;
+    Odom::RPos = 0;
+    Odom::SPos = 0;
 
-    this->LPrevPos = 0;
-    this->RPrevPos = 0;
-    this->SPrevPos = 0;
+    Odom::LPrevPos = 0;
+    Odom::RPrevPos = 0;
+    Odom::SPrevPos = 0;
 
-    this->deltaDistL = 0;
-    this->deltaDistR = 0;
-    this->deltaDistS = 0;
+    Odom::deltaDistL = 0;
+    Odom::deltaDistR = 0;
+    Odom::deltaDistS = 0;
 
-    this->totalDeltaDistL = 0;
-    this->totalDeltaDistR = 0;
+    Odom::totalDeltaDistL = 0;
+    Odom::totalDeltaDistR = 0;
 
-    this->currentAbsoluteOrientation = THETA_START;
-    this->previousTheta = THETA_START;
-    this->deltaTheta = 0;
-    this->avgThetaForArc = currentAbsoluteOrientation + (deltaTheta / 2);
+    Odom::currentAbsoluteOrientation = THETA_START;
+    Odom::previousTheta = THETA_START;
+    Odom::deltaTheta = 0;
+    Odom::avgThetaForArc = currentAbsoluteOrientation + (deltaTheta / 2);
 
-    this->deltaXLocal = 0;
-    this->deltaYLocal = 0;
-    this->deltaXGlobal = 0;
-    this->deltaYGlobal = 0;
+    Odom::deltaXLocal = 0;
+    Odom::deltaYLocal = 0;
+    Odom::deltaXGlobal = 0;
+    Odom::deltaYGlobal = 0;
 
-    this->xPosGlobal = X_START;
-    this->yPosGlobal = Y_START;
-}
-
-void Odom::start_odom(void* iparam) {
-    if(iparam){
-        Odom* that = static_cast<Odom*>(iparam);
-        that->position_tracking();
-    }
+    Odom::xPosGlobal = X_START;
+    Odom::yPosGlobal = Y_START;
 }
 
 /**
@@ -56,7 +49,7 @@ void Odom::start_odom(void* iparam) {
  * @return RobotPosition structure
  */
 RobotPosition Odom::getState() {
-    return this->position;
+    return Odom::position;
 }
 
 /**
@@ -68,18 +61,18 @@ RobotPosition Odom::getState() {
  */
 void Odom::setState(QLength x, QLength y, QAngle angle) {
     // clear variables
-    // this->chassis->tareSensors();
-    this->X_START = x.convert(meter);
-    this->Y_START = y.convert(meter);
-    this->THETA_START = angle.convert(radian);
+    // Odom::chassis->tareSensors();
+    Odom::X_START = x.convert(meter);
+    Odom::Y_START = y.convert(meter);
+    Odom::THETA_START = angle.convert(radian);
 
-    this->reset_variables();
+    Odom::reset_variables();
     // save odom state
-    this->position.x_meter = xPosGlobal;
-    this->position.y_meter = yPosGlobal;
-    this->position.x_pct = xPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
-    this->position.y_pct = yPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
-    this->position.theta = currentAbsoluteOrientation;
+    Odom::position.x_meter = xPosGlobal;
+    Odom::position.y_meter = yPosGlobal;
+    Odom::position.x_pct = xPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
+    Odom::position.y_pct = yPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
+    Odom::position.theta = currentAbsoluteOrientation;
 
 
 }
@@ -93,19 +86,19 @@ void Odom::setState(QLength x, QLength y, QAngle angle) {
  */
 void Odom::setState(float x, float y, float angle) {
     // clear variables
-    // this->chassis->tareSensors();
-    this->X_START = x / 100.0 * Constants::FIELD::FIELD_LENGTH;
-    this->Y_START = y / 100.0 * Constants::FIELD::FIELD_LENGTH;
-    this->THETA_START = angle * pi / 180;
+    // Odom::chassis->tareSensors();
+    Odom::X_START = x / 100.0 * Constants::FIELD::FIELD_LENGTH;
+    Odom::Y_START = y / 100.0 * Constants::FIELD::FIELD_LENGTH;
+    Odom::THETA_START = angle * pi / 180;
 
-    this->reset_variables();
+    Odom::reset_variables();
 
     // save odom state
-    this->position.x_meter = xPosGlobal;
-    this->position.y_meter = yPosGlobal;
-    this->position.x_pct = xPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
-    this->position.y_pct = yPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
-    this->position.theta = currentAbsoluteOrientation;
+    Odom::position.x_meter = xPosGlobal;
+    Odom::position.y_meter = yPosGlobal;
+    Odom::position.x_pct = xPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
+    Odom::position.y_pct = yPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
+    Odom::position.theta = currentAbsoluteOrientation;
 }
 
 /**
@@ -117,34 +110,34 @@ void Odom::position_tracking() {
     printf("Position tracking started\n");
     while(1) {
         // get position values
-        switch (this->odometry_mode) {
+        switch (Odom::odometry_mode) {
             case OdomMode::MOTOR_IMU:
-                // this->LPos = this->chassis->getLeftPosition();
-                // this->RPos = this->chassis->getRightPosition();
+                // Odom::LPos = Odom::chassis->getLeftPosition();
+                // Odom::RPos = Odom::chassis->getRightPosition();
                 if (DEBUG) {
-                    printf("Encoder: L=%f, R=%f\n", this->LPos, this->RPos);
+                    printf("Encoder: L=%f, R=%f\n", Odom::LPos, Odom::RPos);
                 }
                 break;
             case OdomMode::MOTOR_MIDTW_IMU:
-                // this->LPos = this->chassis->getLeftPosition();
-                // this->RPos = this->chassis->getRightPosition();
-                this->SPos = this->midTW->get();
+                // Odom::LPos = Odom::chassis->getLeftPosition();
+                // Odom::RPos = Odom::chassis->getRightPosition();
+                Odom::SPos = Odom::midTW->get();
                 if (DEBUG) {
-                    printf("Encoder: L=%f, R=%f, S=%f\n", this->LPos, this->RPos, this->SPos);
+                    printf("Encoder: L=%f, R=%f, S=%f\n", Odom::LPos, Odom::RPos, Odom::SPos);
                 }
                 break;
             case OdomMode::LEFTTW_MIDTW_IMU:
-                this->LPos = this->leftTW->get();
-                this->SPos = this->midTW->get();
+                Odom::LPos = Odom::leftTW->get();
+                Odom::SPos = Odom::midTW->get();
                 if (DEBUG) {
-                    printf("Encoder: L=%f, S=%f\n", this->LPos, this->SPos);
+                    printf("Encoder: L=%f, S=%f\n", Odom::LPos, Odom::SPos);
                 }
                 break;
             case OdomMode::RIGHTTW_MIDTW_IMU:
-                this->RPos = this->rightTW->get();
-                this->SPos = this->midTW->get();
+                Odom::RPos = Odom::rightTW->get();
+                Odom::SPos = Odom::midTW->get();
                 if (DEBUG) {
-                    printf("Encoder: R=%f, S=%f\n", this->RPos, this->SPos);
+                    printf("Encoder: R=%f, S=%f\n", Odom::RPos, Odom::SPos);
                 }
                 break;
         }
@@ -152,62 +145,62 @@ void Odom::position_tracking() {
 
         //Calculate distance traveled by tracking each wheel (meters)
         //Converts degrees to radians
-        this->deltaDistL = ((this->LPos - this->LPrevPos) * M_PI / 180) * this->WHEEL_RADIUS;
-        this->deltaDistR = ((this->RPos - this->RPrevPos) * M_PI / 180) * this->WHEEL_RADIUS;
-        this->deltaDistS = ((this->SPos - this->SPrevPos) * M_PI / 180) * this->WHEEL_RADIUS;
+        Odom::deltaDistL = ((Odom::LPos - Odom::LPrevPos) * M_PI / 180) * Odom::WHEEL_RADIUS;
+        Odom::deltaDistR = ((Odom::RPos - Odom::RPrevPos) * M_PI / 180) * Odom::WHEEL_RADIUS;
+        Odom::deltaDistS = ((Odom::SPos - Odom::SPrevPos) * M_PI / 180) * Odom::WHEEL_RADIUS;
 
         //Update previous values to be used next loop (DEGREES)
-        this->LPrevPos = this->LPos;
-        this->RPrevPos = this->RPos;
-        this->SPrevPos = this->SPos;
+        Odom::LPrevPos = Odom::LPos;
+        Odom::RPrevPos = Odom::RPos;
+        Odom::SPrevPos = Odom::SPos;
 
         //Total change in each of the L and R encoders since last reset (meters)
         //These are used to calculate the absolute orientation of the bot
-        this->totalDeltaDistL += this->deltaDistL;
-        this->totalDeltaDistR += this->deltaDistR;
+        Odom::totalDeltaDistL += Odom::deltaDistL;
+        Odom::totalDeltaDistR += Odom::deltaDistR;
 
         //Calculate the current absolute orientation (RADIANS)
 
-        this->currentAbsoluteOrientation = this->THETA_START + ((this->imu1->get_rotation() + this->imu2->get_rotation()) / 2) * M_PI / 180.0;
-        if (isinf(this->currentAbsoluteOrientation)) {
-            this->currentAbsoluteOrientation = 0;
+        Odom::currentAbsoluteOrientation = Odom::THETA_START + ((Odom::imu1->get_rotation() + Odom::imu2->get_rotation()) / 2) * M_PI / 180.0;
+        if (isinf(Odom::currentAbsoluteOrientation)) {
+            Odom::currentAbsoluteOrientation = 0;
         }
 
         //Calculate the change in the angle of the bot (RADIANS)
-        this->deltaTheta = this->currentAbsoluteOrientation - this->previousTheta;
+        Odom::deltaTheta = Odom::currentAbsoluteOrientation - Odom::previousTheta;
 
         //Update the previous Theta value (RADIANS)  
-        this->previousTheta = this->currentAbsoluteOrientation;
+        Odom::previousTheta = Odom::currentAbsoluteOrientation;
 
         //If we didn't turn, then we only translated
-        if(this->deltaTheta == 0) {
-            this->deltaXLocal = this->deltaDistS;
-            this->deltaYLocal = this->deltaDistL;
+        if(Odom::deltaTheta == 0) {
+            Odom::deltaXLocal = Odom::deltaDistS;
+            Odom::deltaYLocal = Odom::deltaDistL;
         }
         //Else, caluclate the new local position
         else {
         //Calculate the changes in the X and Y values (meters)
 
         // The calculation assumes that the middle tracking wheel is at the front of the machine
-        this->deltaXLocal = 2 * sin(this->deltaTheta / 2.0) * ((this->deltaDistS / this->deltaTheta) - this->STrackRadius);
-        this->deltaYLocal = 2 * sin(this->deltaTheta / 2.0) * ((this->deltaDistR / this->deltaTheta) + this->RTrackRadius);
+        Odom::deltaXLocal = 2 * sin(Odom::deltaTheta / 2.0) * ((Odom::deltaDistS / Odom::deltaTheta) - Odom::STrackRadius);
+        Odom::deltaYLocal = 2 * sin(Odom::deltaTheta / 2.0) * ((Odom::deltaDistR / Odom::deltaTheta) + Odom::RTrackRadius);
         }
 
         //The average angle of the robot during it's arc (RADIANS)
-        this->avgThetaForArc = this->currentAbsoluteOrientation - (this->deltaTheta / 2);
+        Odom::avgThetaForArc = Odom::currentAbsoluteOrientation - (Odom::deltaTheta / 2);
 
-        this->deltaXGlobal = (this->deltaYLocal * cos(this->avgThetaForArc)) - (this->deltaXLocal * sin(this->avgThetaForArc));
-        this->deltaYGlobal = (this->deltaYLocal * sin(this->avgThetaForArc)) + (this->deltaXLocal * cos(this->avgThetaForArc));
+        Odom::deltaXGlobal = (Odom::deltaYLocal * cos(Odom::avgThetaForArc)) - (Odom::deltaXLocal * sin(Odom::avgThetaForArc));
+        Odom::deltaYGlobal = (Odom::deltaYLocal * sin(Odom::avgThetaForArc)) + (Odom::deltaXLocal * cos(Odom::avgThetaForArc));
 
         //Update global positions
-        this->xPosGlobal += this->deltaXGlobal;
-        this->yPosGlobal += this->deltaYGlobal;
+        Odom::xPosGlobal += Odom::deltaXGlobal;
+        Odom::yPosGlobal += Odom::deltaYGlobal;
 
-        this->position.x_meter = this->xPosGlobal;
-        this->position.y_meter = this->yPosGlobal;
-        this->position.x_pct = this->xPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
-        this->position.y_pct = this->yPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
-        this->position.theta = this->currentAbsoluteOrientation;
+        Odom::position.x_meter = Odom::xPosGlobal;
+        Odom::position.y_meter = Odom::yPosGlobal;
+        Odom::position.x_pct = Odom::xPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
+        Odom::position.y_pct = Odom::yPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
+        Odom::position.theta = Odom::currentAbsoluteOrientation;
 
         pros::delay(10);
 

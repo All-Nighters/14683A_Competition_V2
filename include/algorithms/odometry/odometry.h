@@ -16,65 +16,64 @@ enum class OdomMode {
 class Odom {
     public:
         Odom();
-        RobotPosition getState();
-        void setState(QLength x, QLength y, QAngle angle);
-        void setState(float x, float y, float angle);
+        static RobotPosition getState();
+        static void setState(QLength x, QLength y, QAngle angle);
+        static void setState(float x, float y, float angle);
 
     private:
-        RobotPosition position;
-        OdomMode odometry_mode;
+        static RobotPosition position;
+        static OdomMode odometry_mode;
 
 
         // sensors
-        okapi::ADIEncoder* leftTW;
-        okapi::ADIEncoder* rightTW;
-        okapi::ADIEncoder* midTW;
+        static okapi::ADIEncoder* leftTW;
+        static okapi::ADIEncoder* rightTW;
+        static okapi::ADIEncoder* midTW;
 
-        pros::IMU* imu1;
-        pros::IMU* imu2;
+        static pros::IMU* imu1;
+        static pros::IMU* imu2;
 
-        float WHEEL_RADIUS;
-        float THETA_START;
+        static float WHEEL_RADIUS;
+        static float THETA_START;
         //The starting x and y coordinates of the bot (meters)
-        float X_START;
-        float Y_START; 
+        static float X_START;
+        static float Y_START; 
 
         //Distances of tracking wheels from tracking center (meters)
-        float LTrackRadius;
-        float RTrackRadius;
-        float STrackRadius;
+        static float LTrackRadius;
+        static float RTrackRadius;
+        static float STrackRadius;
 
-        float LPos;
-        float RPos;
-        float SPos;
+        static float LPos;
+        static float RPos;
+        static float SPos;
  
-        float LPrevPos;
-        float RPrevPos;
-        float SPrevPos;
+        static float LPrevPos;
+        static float RPrevPos;
+        static float SPrevPos;
  
-        float deltaDistL;
-        float deltaDistR;
-        float deltaDistS;
+        static float deltaDistL;
+        static float deltaDistR;
+        static float deltaDistS;
  
-        float totalDeltaDistL;
-        float totalDeltaDistR;
+        static float totalDeltaDistL;
+        static float totalDeltaDistR;
  
-        float currentAbsoluteOrientation;
-        float previousTheta;
+        static float currentAbsoluteOrientation;
+        static float previousTheta;
  
-        float deltaTheta;
-        float avgThetaForArc;
+        static float deltaTheta;
+        static float avgThetaForArc;
 
-        float deltaXLocal;
-        float deltaYLocal;
+        static float deltaXLocal;
+        static float deltaYLocal;
  
-        float deltaXGlobal;
-        float deltaYGlobal;
+        static float deltaXGlobal;
+        static float deltaYGlobal;
  
-        float xPosGlobal;
-        float yPosGlobal;
+        static float xPosGlobal;
+        static float yPosGlobal;
 
-        static void start_odom(void* iparam);
-        void reset_variables();
-        void position_tracking();
+        static void reset_variables();
+        static void position_tracking();
 };
