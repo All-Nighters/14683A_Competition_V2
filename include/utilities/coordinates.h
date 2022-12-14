@@ -35,9 +35,4 @@ public:
 	Waypoint(float x_coordinates, float y_coordinates, float lin_vel, float direction = 0, float ang_vel = 0);
 	float get_linear_vel();
 	float get_ang_vel();
-	float get_x();
-	float get_y();
-	float get_direction();
-	float get_distance(Coordinates target_coordinates);
-	static float get_distance_sum(std::vector<Coordinates> chained_coordinates);
 };
