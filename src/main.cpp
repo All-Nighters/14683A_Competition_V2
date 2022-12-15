@@ -1,12 +1,48 @@
 #include "main.h"
 
+struct Core core;
+
+// controller
+okapi::Controller   controller           = okapi::Controller();
+// chassis
+okapi::Motor        chassis_left_front   = okapi::Motor(1);
+okapi::Motor        chassis_left_middle  = okapi::Motor(0);
+okapi::Motor        chassis_left_back    = okapi::Motor(0);
+okapi::Motor        chassis_right_first  = okapi::Motor(0);
+okapi::Motor        chassis_right_middle = okapi::Motor(0);
+okapi::Motor        chassis_right_back   = okapi::Motor(0);
+// accessories
+okapi::Motor        intake               = okapi::Motor(0);
+okapi::Motor        roller               = okapi::Motor(0);
+pros::ADIDigitalOut expansion            = pros::ADIDigitalOut(' ');
+// sensors
+okapi::ADIEncoder   odometry_wheel       = okapi::ADIEncoder(' ', ' ', false);
+pros::Imu           inertial             = pros::Imu(0);
+
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
-void initialize() {}
+void initialize() {
+	// controller
+	core.controller           = &controller;
+	// chassis
+	core.chassis_left_front   = &chassis_left_front;
+	core.chassis_left_middle  = &chassis_left_middle;
+	core.chassis_left_back    = &chassis_left_back;
+	core.chassis_right_first  = &chassis_right_first;
+	core.chassis_right_middle = &chassis_right_middle;
+	core.chassis_right_back   = &chassis_right_back;
+	// accessories
+	core.intake               = &intake;
+	core.roller               = &roller;
+	core.expansion            = &expansion;
+	// sensors
+	core.odometry_wheel       = &odometry_wheel;
+	core.inertial             = &inertial;
+}
 
 /**
  * Runs while the robot is in the disabled state of Field Management System or
@@ -52,4 +88,8 @@ void autonomous() {}
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
-void opcontrol() {}
+void opcontrol() {
+	Roller roller = Roller(&core);
+	//core.chassis_left_front->moveVelocity(200);
+	pros::delay(10000);
+}
