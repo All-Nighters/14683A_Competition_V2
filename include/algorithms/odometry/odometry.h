@@ -19,60 +19,60 @@ enum class OdomMode {
 class Odom {
     public:
         Odom(struct Core* core, OdomMode mode);
-        static RobotPosition getState();
-        static void setState(QLength x, QLength y, QAngle angle);
-        static void setState(float x, float y, float angle);
+        RobotPosition getState();
+        void setState(QLength x, QLength y, QAngle angle);
+        void setState(float x, float y, float angle);
 
     private:
-        static RobotPosition position;
-        static OdomMode odometry_mode;
+        RobotPosition position;
+        OdomMode odometry_mode;
 
 
-        // sensors
-        static struct Core* core;
+        struct Core* core;
 
-        static float WHEEL_RADIUS;
-        static float THETA_START;
+        float WHEEL_RADIUS;
+        float THETA_START;
         //The starting x and y coordinates of the bot (meters)
-        static float X_START;
-        static float Y_START; 
+        float X_START;
+        float Y_START; 
 
         //Distances of tracking wheels from tracking center (meters)
-        static float LTrackRadius;
-        static float RTrackRadius;
-        static float STrackRadius;
+        float LTrackRadius;
+        float RTrackRadius;
+        float STrackRadius;
 
-        static float LPos;
-        static float RPos;
-        static float SPos;
+        float LPos;
+        float RPos;
+        float SPos;
  
-        static float LPrevPos;
-        static float RPrevPos;
-        static float SPrevPos;
+        float LPrevPos;
+        float RPrevPos;
+        float SPrevPos;
  
-        static float deltaDistL;
-        static float deltaDistR;
-        static float deltaDistS;
+        float deltaDistL;
+        float deltaDistR;
+        float deltaDistS;
  
-        static float totalDeltaDistL;
-        static float totalDeltaDistR;
+        float totalDeltaDistL;
+        float totalDeltaDistR;
  
-        static float currentAbsoluteOrientation;
-        static float previousTheta;
+        float currentAbsoluteOrientation;
+        float previousTheta;
  
-        static float deltaTheta;
-        static float avgThetaForArc;
+        float deltaTheta;
+        float avgThetaForArc;
 
-        static float deltaXLocal;
-        static float deltaYLocal;
+        float deltaXLocal;
+        float deltaYLocal;
  
-        static float deltaXGlobal;
-        static float deltaYGlobal;
+        float deltaXGlobal;
+        float deltaYGlobal;
  
-        static float xPosGlobal;
-        static float yPosGlobal;
+        float xPosGlobal;
+        float yPosGlobal;
 
-        static void reset_variables();
-        static void tare_sensors();
-        static void position_tracking();
+        void reset_variables();
+        void tare_sensors();
+        static void start_odom(void* iparam);
+        void position_tracking();
 };

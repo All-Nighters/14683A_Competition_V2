@@ -4,8 +4,9 @@
  * @brief Construct a new Chassis:: Chassis object
  * 
  */
-Chassis::Chassis(struct Core* core) {
+Chassis::Chassis(struct Core* core, Odom* odom) {
     this->core = core;
+    this->odom = odom;
     this->motor_gearset = AbstractMotor::gearset::blue;
     this->maximum_velocity = 600;
 }
@@ -187,14 +188,14 @@ void Chassis::turnAngle(float angle) {
  */
 
 void Chassis::faceAngle(float angle) {
-    RobotPosition robot_state = Odom::getState();
+    RobotPosition robot_state = this->odom->getState();
     float target_angle = angle;
     float prev_error = formatAngle(target_angle) - formatAngle(robot_state.theta);
     float start_time = pros::millis();  
     float timeout = 10; // maximum runtime in seconds
 
     while (abs(formatAngle(target_angle) - formatAngle(robot_state.theta)) >= 0.5 && pros::millis() - start_time <= timeout*1000) {
-        robot_state = Odom::getState();
+        robot_state = this->odom->getState();
 
         float error = formatAngle(target_angle) - formatAngle(robot_state.theta);
         float deriv_error = error - prev_error;

@@ -91,6 +91,6 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-    Chassis chassis = Chassis(&core);
-    chassis.moveVelocity(200);
+    Odom odometry = Odom(&core, OdomMode::LEFTTW_FRONTTW_IMU);
+    Chassis chassis = Chassis(&core, &odometry);
 }
