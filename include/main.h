@@ -91,7 +91,7 @@ struct Core {
 	okapi::Motor*        chassis_left_front;
 	okapi::Motor*        chassis_left_middle;
 	okapi::Motor*        chassis_left_back;
-	okapi::Motor*        chassis_right_first;
+	okapi::Motor*        chassis_right_front;
 	okapi::Motor*        chassis_right_middle;
 	okapi::Motor*        chassis_right_back;
 	// accessories
@@ -100,7 +100,8 @@ struct Core {
 	pros::ADIDigitalOut* expansion;
 	// sensors
 	okapi::ADIEncoder*   odometry_wheel;
-	pros::Imu*           inertial;
+	pros::Imu*           imu_first;
+	pros::Imu*           imu_second;
 };
 void autonomous(void);
 void initialize(void);

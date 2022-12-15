@@ -4,8 +4,10 @@
  * @brief Construct a new Chassis:: Chassis object
  * 
  */
-Chassis::Chassis() {
-    
+Chassis::Chassis(struct Core* core) {
+    this->core = core;
+    this->motor_gearset = AbstractMotor::gearset::blue;
+    this->maximum_velocity = 600;
 }
 
 /**
@@ -13,12 +15,12 @@ Chassis::Chassis() {
  * 
  */
 void Chassis::tareSensors() {
-    this->motor_lf->tarePosition();
-    this->motor_lm->tarePosition();
-    this->motor_lb->tarePosition();
-    this->motor_rf->tarePosition();
-    this->motor_rm->tarePosition();
-    this->motor_rb->tarePosition();
+    this->core->chassis_left_front->tarePosition();
+    this->core->chassis_left_middle->tarePosition();
+    this->core->chassis_left_back->tarePosition();
+    this->core->chassis_right_front->tarePosition();
+    this->core->chassis_right_middle->tarePosition();
+    this->core->chassis_right_back->tarePosition();
 }
 
 /**
@@ -26,12 +28,12 @@ void Chassis::tareSensors() {
  * 
  */
 void Chassis::setBrakeMode(okapi::AbstractMotor::brakeMode brake_mode) {
-    this->motor_lf->setBrakeMode(brake_mode);
-    this->motor_lm->setBrakeMode(brake_mode);
-    this->motor_lb->setBrakeMode(brake_mode);
-    this->motor_rf->setBrakeMode(brake_mode);
-    this->motor_rm->setBrakeMode(brake_mode);
-    this->motor_rb->setBrakeMode(brake_mode);
+    this->core->chassis_left_front->setBrakeMode(brake_mode);
+    this->core->chassis_left_middle->setBrakeMode(brake_mode);
+    this->core->chassis_left_back->setBrakeMode(brake_mode);
+    this->core->chassis_right_front->setBrakeMode(brake_mode);
+    this->core->chassis_right_middle->setBrakeMode(brake_mode);
+    this->core->chassis_right_back->setBrakeMode(brake_mode);
 }
 
 /**
@@ -40,12 +42,12 @@ void Chassis::setBrakeMode(okapi::AbstractMotor::brakeMode brake_mode) {
  * @param vel velocity
  */
 void Chassis::moveVelocity(float vel) {
-    this->motor_lf->moveVelocity(vel);
-    this->motor_lm->moveVelocity(vel);
-    this->motor_lb->moveVelocity(vel);
-    this->motor_rf->moveVelocity(vel);
-    this->motor_rm->moveVelocity(vel);
-    this->motor_rb->moveVelocity(vel);
+    this->core->chassis_left_front  ->moveVelocity(vel);
+    this->core->chassis_left_middle ->moveVelocity(vel);
+    this->core->chassis_left_back   ->moveVelocity(vel);
+    this->core->chassis_right_front ->moveVelocity(vel);
+    this->core->chassis_right_middle->moveVelocity(vel);
+    this->core->chassis_right_back  ->moveVelocity(vel);
 }
 
 /**
@@ -55,12 +57,12 @@ void Chassis::moveVelocity(float vel) {
  * @param right_vel right velocity
  */
 void Chassis::moveVelocity(float left_vel, float right_vel) {
-    this->motor_lf->moveVelocity(left_vel);
-    this->motor_lm->moveVelocity(left_vel);
-    this->motor_lb->moveVelocity(left_vel);
-    this->motor_rf->moveVelocity(right_vel);
-    this->motor_rm->moveVelocity(right_vel);
-    this->motor_rb->moveVelocity(right_vel);
+    this->core->chassis_left_front  ->moveVelocity(left_vel);
+    this->core->chassis_left_middle ->moveVelocity(left_vel);
+    this->core->chassis_left_back   ->moveVelocity(left_vel);
+    this->core->chassis_right_front ->moveVelocity(right_vel);
+    this->core->chassis_right_middle->moveVelocity(right_vel);
+    this->core->chassis_right_back  ->moveVelocity(right_vel);
 }
 
 /**
@@ -69,12 +71,12 @@ void Chassis::moveVelocity(float left_vel, float right_vel) {
  * @param voltage 
  */
 void Chassis::moveVoltage(float voltage) {
-    this->motor_lf->moveVoltage(voltage);
-    this->motor_lm->moveVoltage(voltage);
-    this->motor_lb->moveVoltage(voltage);
-    this->motor_rf->moveVoltage(voltage);
-    this->motor_rm->moveVoltage(voltage);
-    this->motor_rb->moveVoltage(voltage);
+    this->core->chassis_left_front  ->moveVelocity(voltage);
+    this->core->chassis_left_middle ->moveVelocity(voltage);
+    this->core->chassis_left_back   ->moveVelocity(voltage);
+    this->core->chassis_right_front ->moveVelocity(voltage);
+    this->core->chassis_right_middle->moveVelocity(voltage);
+    this->core->chassis_right_back  ->moveVelocity(voltage);
 }
 
 
@@ -85,12 +87,12 @@ void Chassis::moveVoltage(float voltage) {
  * @param right_volt right voltage
  */
 void Chassis::moveVoltage(float left_volt, float right_volt) {
-    this->motor_lf->moveVoltage(left_volt);
-    this->motor_lm->moveVoltage(left_volt);
-    this->motor_lb->moveVoltage(left_volt);
-    this->motor_rf->moveVoltage(right_volt);
-    this->motor_rm->moveVoltage(right_volt);
-    this->motor_rb->moveVoltage(right_volt);
+    this->core->chassis_left_front  ->moveVelocity(left_volt);
+    this->core->chassis_left_middle ->moveVelocity(left_volt);
+    this->core->chassis_left_back   ->moveVelocity(left_volt);
+    this->core->chassis_right_front ->moveVelocity(right_volt);
+    this->core->chassis_right_middle->moveVelocity(right_volt);
+    this->core->chassis_right_back  ->moveVelocity(right_volt);
 }
 
 /**
@@ -100,29 +102,16 @@ void Chassis::moveVoltage(float left_volt, float right_volt) {
  * @param max_voltage motor maximum voltage (-12000 to 12000)
  */
 void Chassis::moveDistance(float pct, float max_voltage) {
-    float target_distance = Constants::FIELD::FIELD_LENGTH * pct / 100;
-    float revs;
-    revs = target_distance / (M_PI*(CONFIG::ROBOT_PARAMETERS::WHEEL_DIAMETER.convert(meter))); // # of revolutions of wheels
-
-    float targetAngle = revs * 360 + this->getLeftPosition();
-
-    float targetFaceAngle = (this->imu1->get_rotation() + this->imu2->get_rotation()) / 2; 
-    float start_time = pros::millis();  
-    float timeout = 10; // maximum runtime in seconds
-
-    int direction;
-
-    if (revs < 0) {
-        direction = -1;
-    } else {
-        direction = 1;
-    }
+    float target_distance    = Constants::FIELD::FIELD_LENGTH * pct / 100;
+    float revs               = target_distance / (M_PI*(CONFIG::ROBOT_PARAMETERS::WHEEL_DIAMETER.convert(meter))); // # of revolutions of wheels
+    float targetAngle        = revs * 360 + this->getLeftPosition();
+    float targetFaceAngle    = (this->imu1->get_rotation() + this->imu2->get_rotation()) / 2; 
+    float start_time         = pros::millis();  
+    int direction            = revs < 0 ? -1 : 1;
+    float timeout            = 10; // maximum runtime in seconds
     
-    float prevErrorPosition = abs(targetAngle - this->getLeftPosition());
+    float prevErrorPosition  = abs(targetAngle - this->getLeftPosition());
     float prevFaceAngleError = 0;
-
-
-
 
     while (abs(targetAngle - this->getLeftPosition()) >= 10 && 
     pros::millis() - start_time <= timeout*1000) {
@@ -151,13 +140,8 @@ void Chassis::moveDistance(float pct, float max_voltage) {
             control_output_Left = 2000;
             control_output_Right = 2000;
         }
-
-
         prevErrorPosition = error_position;
-
-
         this->moveVoltage(control_output_Left, control_output_Right);
-
         pros::delay(20);
     }
     this->moveVoltage(0);
@@ -238,7 +222,7 @@ void Chassis::faceAngle(float angle) {
  * @return left track motor position reading
  */
 float Chassis::getLeftPosition() {
-    return (this->motor_lf->getPosition() + this->motor_lm->getPosition()  + this->motor_lb->getPosition()) / 3.0;
+    return (this->core->chassis_left_front->getPosition() + this->core->chassis_left_middle->getPosition()  + this->core->chassis_left_back->getPosition()) / 3.0;
 }
 
 /**
@@ -247,21 +231,21 @@ float Chassis::getLeftPosition() {
  * @return right track motor position reading
  */
 float Chassis::getRightPosition() {
-    return (this->motor_rf->getPosition() + this->motor_rm->getPosition()  + this->motor_rb->getPosition()) / 3.0;
+    return (this->core->chassis_right_front->getPosition() + this->core->chassis_right_middle->getPosition()  + this->core->chassis_right_back->getPosition()) / 3.0;
 }
 
 /**
  * @brief Cheezy driver control
  * 
- * @param throttle forward power
- * @param turn turn power
+ * @param throttle forward power (-127 to 127)
+ * @param turn turn power (-127 to 127)
  */
 void Chassis::cheezyDrive(float throttle, float turn) {
-    float turn_vel = turn * abs(throttle);
-    float forward_vel = throttle;
+    float turn_vel = (turn / 127.0) * abs(throttle / 127.0) * this->maximum_velocity;
+    float forward_vel = throttle * this->maximum_velocity;
 
     this->moveVelocity(
-        clamp(forward_vel + turn_vel, -200, 200), 
-        clamp(forward_vel - turn_vel, -200, 200)
+        clamp(forward_vel + turn_vel, -this->maximum_velocity, this->maximum_velocity), 
+        clamp(forward_vel - turn_vel, -this->maximum_velocity, this->maximum_velocity)
     );
 }

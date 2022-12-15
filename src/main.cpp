@@ -8,7 +8,7 @@ okapi::Controller   controller           = okapi::Controller();
 okapi::Motor        chassis_left_front   = okapi::Motor(1);
 okapi::Motor        chassis_left_middle  = okapi::Motor(0);
 okapi::Motor        chassis_left_back    = okapi::Motor(0);
-okapi::Motor        chassis_right_first  = okapi::Motor(0);
+okapi::Motor        chassis_right_front  = okapi::Motor(0);
 okapi::Motor        chassis_right_middle = okapi::Motor(0);
 okapi::Motor        chassis_right_back   = okapi::Motor(0);
 // accessories
@@ -17,7 +17,8 @@ okapi::Motor        roller               = okapi::Motor(0);
 pros::ADIDigitalOut expansion            = pros::ADIDigitalOut(' ');
 // sensors
 okapi::ADIEncoder   odometry_wheel       = okapi::ADIEncoder(' ', ' ', false);
-pros::Imu           inertial             = pros::Imu(0);
+pros::Imu           imu_first            = pros::Imu(0);
+pros::Imu           imu_second           = pros::Imu(0);
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -32,7 +33,7 @@ void initialize() {
 	core.chassis_left_front   = &chassis_left_front;
 	core.chassis_left_middle  = &chassis_left_middle;
 	core.chassis_left_back    = &chassis_left_back;
-	core.chassis_right_first  = &chassis_right_first;
+	core.chassis_right_front  = &chassis_right_front;
 	core.chassis_right_middle = &chassis_right_middle;
 	core.chassis_right_back   = &chassis_right_back;
 	// accessories
@@ -41,7 +42,8 @@ void initialize() {
 	core.expansion            = &expansion;
 	// sensors
 	core.odometry_wheel       = &odometry_wheel;
-	core.inertial             = &inertial;
+	core.imu_first            = &imu_first;
+    core.imu_second           = &imu_second;
 }
 
 /**
@@ -89,7 +91,6 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	Roller roller = Roller(&core);
-	//core.chassis_left_front->moveVelocity(200);
-	pros::delay(10000);
+    Chassis chassis = Chassis(&core);
+    chassis.moveVelocity(200);
 }

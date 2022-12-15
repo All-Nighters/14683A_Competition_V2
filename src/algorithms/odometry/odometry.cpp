@@ -167,40 +167,40 @@ void Odom::position_tracking() {
         }
 
         //Calculate the change in the angle of the bot (RADIANS)
-        Odom::deltaTheta = Odom::currentAbsoluteOrientation - Odom::previousTheta;
+        Odom::deltaTheta       = Odom::currentAbsoluteOrientation - Odom::previousTheta;
 
         //Update the previous Theta value (RADIANS)  
-        Odom::previousTheta = Odom::currentAbsoluteOrientation;
+        Odom::previousTheta    = Odom::currentAbsoluteOrientation;
 
         //If we didn't turn, then we only translated
         if(Odom::deltaTheta == 0) {
-            Odom::deltaXLocal = Odom::deltaDistS;
-            Odom::deltaYLocal = Odom::deltaDistL;
+            Odom::deltaXLocal  = Odom::deltaDistS;
+            Odom::deltaYLocal  = Odom::deltaDistL;
         }
         //Else, caluclate the new local position
         else {
         //Calculate the changes in the X and Y values (meters)
 
         // The calculation assumes that the middle tracking wheel is at the front of the machine
-        Odom::deltaXLocal = 2 * sin(Odom::deltaTheta / 2.0) * ((Odom::deltaDistS / Odom::deltaTheta) - Odom::STrackRadius);
-        Odom::deltaYLocal = 2 * sin(Odom::deltaTheta / 2.0) * ((Odom::deltaDistR / Odom::deltaTheta) + Odom::RTrackRadius);
+            Odom::deltaXLocal  = 2 * sin(Odom::deltaTheta / 2.0) * ((Odom::deltaDistS / Odom::deltaTheta) - Odom::STrackRadius);
+            Odom::deltaYLocal  = 2 * sin(Odom::deltaTheta / 2.0) * ((Odom::deltaDistR / Odom::deltaTheta) + Odom::RTrackRadius);
         }
 
         //The average angle of the robot during it's arc (RADIANS)
-        Odom::avgThetaForArc = Odom::currentAbsoluteOrientation - (Odom::deltaTheta / 2);
+        Odom::avgThetaForArc   = Odom::currentAbsoluteOrientation - (Odom::deltaTheta / 2);
 
-        Odom::deltaXGlobal = (Odom::deltaYLocal * cos(Odom::avgThetaForArc)) - (Odom::deltaXLocal * sin(Odom::avgThetaForArc));
-        Odom::deltaYGlobal = (Odom::deltaYLocal * sin(Odom::avgThetaForArc)) + (Odom::deltaXLocal * cos(Odom::avgThetaForArc));
+        Odom::deltaXGlobal     = (Odom::deltaYLocal * cos(Odom::avgThetaForArc)) - (Odom::deltaXLocal * sin(Odom::avgThetaForArc));
+        Odom::deltaYGlobal     = (Odom::deltaYLocal * sin(Odom::avgThetaForArc)) + (Odom::deltaXLocal * cos(Odom::avgThetaForArc));
 
         //Update global positions
-        Odom::xPosGlobal += Odom::deltaXGlobal;
-        Odom::yPosGlobal += Odom::deltaYGlobal;
+        Odom::xPosGlobal      += Odom::deltaXGlobal;
+        Odom::yPosGlobal      += Odom::deltaYGlobal;
 
         Odom::position.x_meter = Odom::xPosGlobal;
         Odom::position.y_meter = Odom::yPosGlobal;
-        Odom::position.x_pct = Odom::xPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
-        Odom::position.y_pct = Odom::yPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
-        Odom::position.theta = Odom::currentAbsoluteOrientation;
+        Odom::position.x_pct   = Odom::xPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
+        Odom::position.y_pct   = Odom::yPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
+        Odom::position.theta   = Odom::currentAbsoluteOrientation;
 
         pros::delay(10);
 

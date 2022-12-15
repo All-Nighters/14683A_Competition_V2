@@ -2,7 +2,7 @@ using namespace okapi;
 
 class Chassis {
     public:
-        Chassis();
+        Chassis(struct Core* core);
         void setBrakeMode(AbstractMotor::brakeMode brake_mode);
 
         // basic movement functions
@@ -42,12 +42,9 @@ class Chassis {
         float Di;
         float Dd;
 
-        Motor* motor_lf;
-        Motor* motor_lm;
-        Motor* motor_lb;
-        Motor* motor_rf;
-        Motor* motor_rm;
-        Motor* motor_rb;
+        struct Core* core;
+        AbstractMotor::gearset motor_gearset;
+        float maximum_velocity;
 
         ADIEncoder* leftTW;
         ADIEncoder* rightTW;
