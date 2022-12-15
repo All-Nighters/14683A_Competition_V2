@@ -39,7 +39,7 @@ namespace Constants {
 		inline lv_color_t SELECTOR_BODY_BUTTON_BACKGROUND_PRESSED     = LV_COLOR_HEX(0x15803D);
 	}
 
-    namespace FIELD {
+    namespace Field {
         inline float FIELD_LENGTH = 3.6576;
 
         // high goal coordinates
@@ -53,6 +53,15 @@ namespace Constants {
         inline QMass DISK_MASS = 0.06_kg;
         inline float DISK_HORIZONTAL_AREA = 0.015393804;
         inline float DISK_VERTICAL_AREA = 0.0028;
+    }
+
+	namespace Robot {
+        inline QLength WHEEL_DIAMETER               = 2.75_in;
+        inline QLength TRACK_LENGTH                 = 27_cm;
+        inline QLength MIDDLE_ENCODER_DISTANCE      = 12_cm;
+        inline QLength TRACKING_WHEEL_DIAMETER      = 2.75_in;
+        inline float   EXTERNAL_GEAR_RATIO          = 1;
+        inline AbstractMotor::gearset MOTOR_GEARSET = AbstractMotor::gearset::blue;
     }
 
 }

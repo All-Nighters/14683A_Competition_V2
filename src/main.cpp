@@ -5,20 +5,20 @@ struct Core core;
 // controller
 okapi::Controller   controller           = okapi::Controller();
 // chassis
-okapi::Motor        chassis_left_front   = okapi::Motor(1);
-okapi::Motor        chassis_left_middle  = okapi::Motor(0);
-okapi::Motor        chassis_left_back    = okapi::Motor(0);
-okapi::Motor        chassis_right_front  = okapi::Motor(0);
-okapi::Motor        chassis_right_middle = okapi::Motor(0);
-okapi::Motor        chassis_right_back   = okapi::Motor(0);
+okapi::Motor        chassis_left_front   = okapi::Motor(Configuration::Motors::CHASSIS_LEFT_FRONT);
+okapi::Motor        chassis_left_middle  = okapi::Motor(Configuration::Motors::CHASSIS_LEFT_MIDDLE);
+okapi::Motor        chassis_left_back    = okapi::Motor(Configuration::Motors::CHASSIS_LEFT_BACK);
+okapi::Motor        chassis_right_front  = okapi::Motor(Configuration::Motors::CHASSIS_RIGHT_FRONT);
+okapi::Motor        chassis_right_middle = okapi::Motor(Configuration::Motors::CHASSIS_RIGHT_MIDDLE);
+okapi::Motor        chassis_right_back   = okapi::Motor(Configuration::Motors::CHASSIS_RIGHT_BACK);
 // accessories
-okapi::Motor        intake               = okapi::Motor(0);
-okapi::Motor        roller               = okapi::Motor(0);
-pros::ADIDigitalOut expansion            = pros::ADIDigitalOut(' ');
+okapi::Motor        intake               = okapi::Motor(Configuration::Motors::INTAKE);
+okapi::Motor        roller               = okapi::Motor(Configuration::Motors::ROLLER);
+pros::ADIDigitalOut expansion            = pros::ADIDigitalOut(Configuration::Analog::EXPANSION);
 // sensors
-okapi::ADIEncoder   odometry_wheel       = okapi::ADIEncoder(' ', ' ', false);
-pros::Imu           imu_first            = pros::Imu(0);
-pros::Imu           imu_second           = pros::Imu(0);
+okapi::ADIEncoder   odometry_wheel       = okapi::ADIEncoder(Configuration::Analog::ODOMETRY[0], Configuration::Analog::ODOMETRY[1], false);
+pros::Imu           imu_first            = pros::Imu(Configuration::Analog::IMU[0]);
+pros::Imu           imu_second           = pros::Imu(Configuration::Analog::IMU[1]);
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
