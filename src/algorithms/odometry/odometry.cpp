@@ -1,14 +1,17 @@
 #define DEBUG true
 #include "main.h"
 
-Odom::Odom() {
+Odom::Odom(struct Core* core, OdomMode mode) {
+    Odom::core = core;
+    Odom::odometry_mode = mode;
     Odom::WHEEL_RADIUS = Constants::Robot::WHEEL_DIAMETER.convert(meter) / 2;
     Odom::LTrackRadius = Constants::Robot::TRACK_LENGTH.convert(meter) / 2;
     Odom::RTrackRadius = Constants::Robot::TRACK_LENGTH.convert(meter) / 2;
     Odom::STrackRadius = Constants::Robot::MIDDLE_ENCODER_DISTANCE.convert(meter) / 2;
 
-
     Odom::reset_variables();
+    Odom::tare_sensors();
+    
 
     pros::Task loop(Odom::position_tracking);
 }
@@ -43,6 +46,32 @@ void Odom::reset_variables() {
     Odom::yPosGlobal = Y_START;
 }
 
+void Odom::tare_sensors() {
+    Odom::core->chassis_left_front   ->tarePosition();
+    Odom::core->chassis_left_middle  ->tarePosition();
+    Odom::core->chassis_left_back    ->tarePosition();
+    Odom::core->chassis_right_front  ->tarePosition();
+    Odom::core->chassis_right_middle ->tarePosition();
+    Odom::core->chassis_right_back   ->tarePosition();
+    
+    if (Odom::odometry_mode == OdomMode::LEFTTW_FRONTTW_IMU ||
+        Odom::odometry_mode == OdomMode::LEFTTW_BACKTW_IMU) {
+        Odom::core->left_tracking_wheel->reset();    
+    }
+    else if (Odom::odometry_mode == OdomMode::RIGHTTW_FRONTTW_IMU ||
+             Odom::odometry_mode == OdomMode::RIGHTTW_BACKTW_IMU) {
+        Odom::core->right_tracking_wheel->reset();    
+    }
+    if (Odom::odometry_mode == OdomMode::LEFTTW_FRONTTW_IMU ||
+        Odom::odometry_mode == OdomMode::RIGHTTW_FRONTTW_IMU) {
+        Odom::core->front_tracking_wheel->reset();    
+    }
+    else if (Odom::odometry_mode == OdomMode::LEFTTW_BACKTW_IMU ||
+             Odom::odometry_mode == OdomMode::RIGHTTW_BACKTW_IMU) {
+        Odom::core->back_tracking_wheel->reset();    
+    }
+}
+
 /**
  * @brief Get the robot's position
  * 
@@ -61,7 +90,6 @@ RobotPosition Odom::getState() {
  */
 void Odom::setState(QLength x, QLength y, QAngle angle) {
     // clear variables
-    // Odom::chassis->tareSensors();
     Odom::X_START = x.convert(meter);
     Odom::Y_START = y.convert(meter);
     Odom::THETA_START = angle.convert(radian);
@@ -86,7 +114,6 @@ void Odom::setState(QLength x, QLength y, QAngle angle) {
  */
 void Odom::setState(float x, float y, float angle) {
     // clear variables
-    // Odom::chassis->tareSensors();
     Odom::X_START = x / 100.0 * Constants::Field::FIELD_LENGTH;
     Odom::Y_START = y / 100.0 * Constants::Field::FIELD_LENGTH;
     Odom::THETA_START = angle * pi / 180;
@@ -112,30 +139,76 @@ void Odom::position_tracking() {
         // get position values
         switch (Odom::odometry_mode) {
             case OdomMode::MOTOR_IMU:
-                // Odom::LPos = Odom::chassis->getLeftPosition();
-                // Odom::RPos = Odom::chassis->getRightPosition();
+                Odom::LPos = (Odom::core->chassis_left_front->getPosition() +
+                              Odom::core->chassis_left_middle->getPosition() +
+                              Odom::core->chassis_left_back->getPosition()) / 3.0;
+                Odom::RPos = (Odom::core->chassis_right_front->getPosition() +
+                              Odom::core->chassis_right_middle->getPosition() +
+                              Odom::core->chassis_right_back->getPosition()) / 3.0;
                 if (DEBUG) {
                     printf("Encoder: L=%f, R=%f\n", Odom::LPos, Odom::RPos);
                 }
                 break;
-            case OdomMode::MOTOR_MIDTW_IMU:
-                // Odom::LPos = Odom::chassis->getLeftPosition();
-                // Odom::RPos = Odom::chassis->getRightPosition();
-                Odom::SPos = Odom::midTW->get();
+            case OdomMode::MOTOR_FRONTTW_IMU:
+                Odom::LPos = (Odom::core->chassis_left_front->getPosition() +
+                              Odom::core->chassis_left_middle->getPosition() +
+                              Odom::core->chassis_left_back->getPosition()) / 3.0;
+                Odom::RPos = (Odom::core->chassis_right_front->getPosition() +
+                              Odom::core->chassis_right_middle->getPosition() +
+                              Odom::core->chassis_right_back->getPosition()) / 3.0;
+                Odom::SPos = Odom::core->front_tracking_wheel->get();
                 if (DEBUG) {
                     printf("Encoder: L=%f, R=%f, S=%f\n", Odom::LPos, Odom::RPos, Odom::SPos);
                 }
                 break;
-            case OdomMode::LEFTTW_MIDTW_IMU:
-                Odom::LPos = Odom::leftTW->get();
-                Odom::SPos = Odom::midTW->get();
+            case OdomMode::LEFTTW_FRONTTW_IMU:
+                Odom::LPos = (Odom::core->chassis_left_front->getPosition() +
+                              Odom::core->chassis_left_middle->getPosition() +
+                              Odom::core->chassis_left_back->getPosition()) / 3.0;
+                Odom::SPos = Odom::core->front_tracking_wheel->get();
                 if (DEBUG) {
                     printf("Encoder: L=%f, S=%f\n", Odom::LPos, Odom::SPos);
                 }
                 break;
-            case OdomMode::RIGHTTW_MIDTW_IMU:
-                Odom::RPos = Odom::rightTW->get();
-                Odom::SPos = Odom::midTW->get();
+            case OdomMode::RIGHTTW_FRONTTW_IMU:
+                Odom::RPos = (Odom::core->chassis_right_front->getPosition() +
+                              Odom::core->chassis_right_middle->getPosition() +
+                              Odom::core->chassis_right_back->getPosition()) / 3.0;
+                Odom::SPos = Odom::core->front_tracking_wheel->get();
+                if (DEBUG) {
+                    printf("Encoder: R=%f, S=%f\n", Odom::RPos, Odom::SPos);
+                }
+                break;
+
+            case OdomMode::MOTOR_BACKTW_IMU:
+                Odom::STrackRadius = -Constants::Robot::MIDDLE_ENCODER_DISTANCE.convert(meter) / 2;
+                Odom::LPos = (Odom::core->chassis_left_front->getPosition() +
+                              Odom::core->chassis_left_middle->getPosition() +
+                              Odom::core->chassis_left_back->getPosition()) / 3.0;
+                Odom::RPos = (Odom::core->chassis_right_front->getPosition() +
+                              Odom::core->chassis_right_middle->getPosition() +
+                              Odom::core->chassis_right_back->getPosition()) / 3.0;
+                Odom::SPos = Odom::core->front_tracking_wheel->get();
+                if (DEBUG) {
+                    printf("Encoder: L=%f, R=%f, S=%f\n", Odom::LPos, Odom::RPos, Odom::SPos);
+                }
+                break;
+            case OdomMode::LEFTTW_BACKTW_IMU:
+                Odom::STrackRadius = -Constants::Robot::MIDDLE_ENCODER_DISTANCE.convert(meter) / 2;
+                Odom::LPos = (Odom::core->chassis_left_front->getPosition() +
+                              Odom::core->chassis_left_middle->getPosition() +
+                              Odom::core->chassis_left_back->getPosition()) / 3.0;
+                Odom::SPos = Odom::core->front_tracking_wheel->get();
+                if (DEBUG) {
+                    printf("Encoder: L=%f, S=%f\n", Odom::LPos, Odom::SPos);
+                }
+                break;
+            case OdomMode::RIGHTTW_BACKTW_IMU:
+                Odom::STrackRadius = -Constants::Robot::MIDDLE_ENCODER_DISTANCE.convert(meter) / 2;
+                Odom::RPos = (Odom::core->chassis_right_front->getPosition() +
+                              Odom::core->chassis_right_middle->getPosition() +
+                              Odom::core->chassis_right_back->getPosition()) / 3.0;
+                Odom::SPos = Odom::core->front_tracking_wheel->get();
                 if (DEBUG) {
                     printf("Encoder: R=%f, S=%f\n", Odom::RPos, Odom::SPos);
                 }
@@ -161,7 +234,7 @@ void Odom::position_tracking() {
 
         //Calculate the current absolute orientation (RADIANS)
 
-        Odom::currentAbsoluteOrientation = Odom::THETA_START + ((Odom::imu1->get_rotation() + Odom::imu2->get_rotation()) / 2) * M_PI / 180.0;
+        Odom::currentAbsoluteOrientation = Odom::THETA_START + ((Odom::core->imu_first->get_rotation() + Odom::core->imu_second->get_rotation()) / 2) * M_PI / 180.0;
         if (isinf(Odom::currentAbsoluteOrientation)) {
             Odom::currentAbsoluteOrientation = 0;
         }
@@ -175,7 +248,18 @@ void Odom::position_tracking() {
         //If we didn't turn, then we only translated
         if(Odom::deltaTheta == 0) {
             Odom::deltaXLocal  = Odom::deltaDistS;
-            Odom::deltaYLocal  = Odom::deltaDistL;
+            if (Odom::odometry_mode == OdomMode::MOTOR_IMU ||
+                Odom::odometry_mode == OdomMode::MOTOR_FRONTTW_IMU ||
+                Odom::odometry_mode == OdomMode::MOTOR_BACKTW_IMU ||
+                Odom::odometry_mode == OdomMode::LEFTTW_FRONTTW_IMU ||
+                Odom::odometry_mode == OdomMode::LEFTTW_BACKTW_IMU
+            ) {
+                Odom::deltaYLocal  = Odom::deltaDistL;
+            } 
+            else if (Odom::odometry_mode == OdomMode::RIGHTTW_FRONTTW_IMU ||
+                     Odom::odometry_mode == OdomMode::RIGHTTW_BACKTW_IMU) {
+                Odom::deltaYLocal  = Odom::deltaDistR;
+            }
         }
         //Else, caluclate the new local position
         else {

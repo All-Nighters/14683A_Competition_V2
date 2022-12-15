@@ -8,14 +8,17 @@ typedef struct RobotPosition {
 
 enum class OdomMode {
     MOTOR_IMU,          ///< motor encoder and IMU odometry 
-    MOTOR_MIDTW_IMU,    ///< motor encoder, middle tracking wheel, and IMU
-    LEFTTW_MIDTW_IMU,   ///< left and middle tracking wheels and IMU
-    RIGHTTW_MIDTW_IMU,  ///< right and middle tracking wheels and IMU
+    MOTOR_FRONTTW_IMU,    ///< motor encoder, front tracking wheel, and IMU
+    LEFTTW_FRONTTW_IMU,   ///< left and front tracking wheels and IMU
+    RIGHTTW_FRONTTW_IMU,  ///< right and front tracking wheels and IMU
+    MOTOR_BACKTW_IMU,    ///< motor encoder, front tracking wheel, and IMU
+    LEFTTW_BACKTW_IMU,   ///< left and front tracking wheels and IMU
+    RIGHTTW_BACKTW_IMU,  ///< right and front tracking wheels and IMU
 };
 
 class Odom {
     public:
-        Odom();
+        Odom(struct Core* core, OdomMode mode);
         static RobotPosition getState();
         static void setState(QLength x, QLength y, QAngle angle);
         static void setState(float x, float y, float angle);
@@ -26,12 +29,7 @@ class Odom {
 
 
         // sensors
-        static okapi::ADIEncoder* leftTW;
-        static okapi::ADIEncoder* rightTW;
-        static okapi::ADIEncoder* midTW;
-
-        static pros::IMU* imu1;
-        static pros::IMU* imu2;
+        static struct Core* core;
 
         static float WHEEL_RADIUS;
         static float THETA_START;
@@ -75,5 +73,6 @@ class Odom {
         static float yPosGlobal;
 
         static void reset_variables();
+        static void tare_sensors();
         static void position_tracking();
 };

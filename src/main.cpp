@@ -41,7 +41,7 @@ void initialize() {
 	core.roller               = &roller;
 	core.expansion            = &expansion;
 	// sensors
-	core.left_tracking_wheel       = &left_tracking_wheel;
+	core.left_tracking_wheel  = &left_tracking_wheel;
 	core.imu_first            = &imu_first;
     core.imu_second           = &imu_second;
 }
