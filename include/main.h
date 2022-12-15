@@ -99,7 +99,10 @@ struct Core {
 	okapi::Motor*        roller;
 	pros::ADIDigitalOut* expansion;
 	// sensors
-	okapi::ADIEncoder*   odometry_wheel;
+	okapi::ADIEncoder*   left_tracking_wheel;
+	okapi::ADIEncoder*   right_tracking_wheel;
+	okapi::ADIEncoder*   front_tracking_wheel;
+	okapi::ADIEncoder*   back_tracking_wheel;
 	pros::Imu*           imu_first;
 	pros::Imu*           imu_second;
 };

@@ -25,7 +25,7 @@ float formatAngle(float a) {
  * @returns length in percentage 
  */
 float meterToPercentage(float m) {
-    return m / Constants::FIELD::FIELD_LENGTH * 100.0;
+    return m / Constants::Field::FIELD_LENGTH * 100.0;
 }
 
 /**
@@ -35,7 +35,7 @@ float meterToPercentage(float m) {
  * @returns length in meters 
  */
 float percentageToMeter(float p) {
-    return p / 100.0 * Constants::FIELD::FIELD_LENGTH;
+    return p / 100.0 * Constants::Field::FIELD_LENGTH;
 }
 
 /**

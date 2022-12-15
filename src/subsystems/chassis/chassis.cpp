@@ -102,8 +102,8 @@ void Chassis::moveVoltage(float left_volt, float right_volt) {
  * @param max_voltage motor maximum voltage (-12000 to 12000)
  */
 void Chassis::moveDistance(float pct, float max_voltage) {
-    float target_distance    = Constants::FIELD::FIELD_LENGTH * pct / 100;
-    float revs               = target_distance / (M_PI*(CONFIG::ROBOT_PARAMETERS::WHEEL_DIAMETER.convert(meter))); // # of revolutions of wheels
+    float target_distance    = Constants::Field::FIELD_LENGTH * pct / 100;
+    float revs               = target_distance / (M_PI*(Constants::Robot::WHEEL_DIAMETER.convert(meter))); // # of revolutions of wheels
     float targetAngle        = revs * 360 + this->getLeftPosition();
     float targetFaceAngle    = (this->imu1->get_rotation() + this->imu2->get_rotation()) / 2; 
     float start_time         = pros::millis();  

@@ -2,10 +2,10 @@
 #include "main.h"
 
 Odom::Odom() {
-    Odom::WHEEL_RADIUS = CONFIG::ROBOT_PARAMETERS::WHEEL_DIAMETER.convert(meter) / 2;
-    Odom::LTrackRadius = CONFIG::ROBOT_PARAMETERS::TRACK_LENGTH.convert(meter) / 2;
-    Odom::RTrackRadius = CONFIG::ROBOT_PARAMETERS::TRACK_LENGTH.convert(meter) / 2;
-    Odom::STrackRadius = CONFIG::ROBOT_PARAMETERS::MIDDLE_ENCODER_DISTANCE.convert(meter) / 2;
+    Odom::WHEEL_RADIUS = Constants::Robot::WHEEL_DIAMETER.convert(meter) / 2;
+    Odom::LTrackRadius = Constants::Robot::TRACK_LENGTH.convert(meter) / 2;
+    Odom::RTrackRadius = Constants::Robot::TRACK_LENGTH.convert(meter) / 2;
+    Odom::STrackRadius = Constants::Robot::MIDDLE_ENCODER_DISTANCE.convert(meter) / 2;
 
 
     Odom::reset_variables();
@@ -70,8 +70,8 @@ void Odom::setState(QLength x, QLength y, QAngle angle) {
     // save odom state
     Odom::position.x_meter = xPosGlobal;
     Odom::position.y_meter = yPosGlobal;
-    Odom::position.x_pct = xPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
-    Odom::position.y_pct = yPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
+    Odom::position.x_pct = xPosGlobal / Constants::Field::FIELD_LENGTH * 100;
+    Odom::position.y_pct = yPosGlobal / Constants::Field::FIELD_LENGTH * 100;
     Odom::position.theta = currentAbsoluteOrientation;
 
 
@@ -87,8 +87,8 @@ void Odom::setState(QLength x, QLength y, QAngle angle) {
 void Odom::setState(float x, float y, float angle) {
     // clear variables
     // Odom::chassis->tareSensors();
-    Odom::X_START = x / 100.0 * Constants::FIELD::FIELD_LENGTH;
-    Odom::Y_START = y / 100.0 * Constants::FIELD::FIELD_LENGTH;
+    Odom::X_START = x / 100.0 * Constants::Field::FIELD_LENGTH;
+    Odom::Y_START = y / 100.0 * Constants::Field::FIELD_LENGTH;
     Odom::THETA_START = angle * pi / 180;
 
     Odom::reset_variables();
@@ -96,8 +96,8 @@ void Odom::setState(float x, float y, float angle) {
     // save odom state
     Odom::position.x_meter = xPosGlobal;
     Odom::position.y_meter = yPosGlobal;
-    Odom::position.x_pct = xPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
-    Odom::position.y_pct = yPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
+    Odom::position.x_pct = xPosGlobal / Constants::Field::FIELD_LENGTH * 100;
+    Odom::position.y_pct = yPosGlobal / Constants::Field::FIELD_LENGTH * 100;
     Odom::position.theta = currentAbsoluteOrientation;
 }
 
@@ -198,8 +198,8 @@ void Odom::position_tracking() {
 
         Odom::position.x_meter = Odom::xPosGlobal;
         Odom::position.y_meter = Odom::yPosGlobal;
-        Odom::position.x_pct   = Odom::xPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
-        Odom::position.y_pct   = Odom::yPosGlobal / Constants::FIELD::FIELD_LENGTH * 100;
+        Odom::position.x_pct   = Odom::xPosGlobal / Constants::Field::FIELD_LENGTH * 100;
+        Odom::position.y_pct   = Odom::yPosGlobal / Constants::Field::FIELD_LENGTH * 100;
         Odom::position.theta   = Odom::currentAbsoluteOrientation;
 
         pros::delay(10);
