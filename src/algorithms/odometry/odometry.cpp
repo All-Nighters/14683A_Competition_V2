@@ -102,6 +102,7 @@ void Odom::setState(QLength x, QLength y, QAngle angle) {
     this->THETA_START = angle.convert(radian);
 
     this->reset_variables();
+    this->tare_sensors();
     // save odom state
     this->position.x_meter = xPosGlobal;
     this->position.y_meter = yPosGlobal;
@@ -148,10 +149,13 @@ void Odom::position_tracking() {
             case OdomMode::MOTOR_IMU:
                 this->LPos = (this->core->chassis_left_front->getPosition() +
                               this->core->chassis_left_middle->getPosition() +
-                              this->core->chassis_left_back->getPosition()) / 3.0;
+                              this->core->chassis_left_back->getPosition()) / 3.0 
+                              * Constants::Robot::EXTERNAL_GEAR_RATIO;
+
                 this->RPos = (this->core->chassis_right_front->getPosition() +
                               this->core->chassis_right_middle->getPosition() +
-                              this->core->chassis_right_back->getPosition()) / 3.0;
+                              this->core->chassis_right_back->getPosition()) / 3.0
+                               * Constants::Robot::EXTERNAL_GEAR_RATIO;
                 if (DEBUG) {
                     printf("Encoder: L=%f, R=%f\n", this->LPos, this->RPos);
                 }
@@ -159,28 +163,27 @@ void Odom::position_tracking() {
             case OdomMode::MOTOR_FRONTTW_IMU:
                 this->LPos = (this->core->chassis_left_front->getPosition() +
                               this->core->chassis_left_middle->getPosition() +
-                              this->core->chassis_left_back->getPosition()) / 3.0;
+                              this->core->chassis_left_back->getPosition()) / 3.0
+                               * Constants::Robot::EXTERNAL_GEAR_RATIO;
+
                 this->RPos = (this->core->chassis_right_front->getPosition() +
                               this->core->chassis_right_middle->getPosition() +
-                              this->core->chassis_right_back->getPosition()) / 3.0;
+                              this->core->chassis_right_back->getPosition()) / 3.0
+                               * Constants::Robot::EXTERNAL_GEAR_RATIO;
                 this->SPos = this->core->front_tracking_wheel->get();
                 if (DEBUG) {
                     printf("Encoder: L=%f, R=%f, S=%f\n", this->LPos, this->RPos, this->SPos);
                 }
                 break;
             case OdomMode::LEFTTW_FRONTTW_IMU:
-                this->LPos = (this->core->chassis_left_front->getPosition() +
-                              this->core->chassis_left_middle->getPosition() +
-                              this->core->chassis_left_back->getPosition()) / 3.0;
+                this->LPos = this->core->left_tracking_wheel->get();
                 this->SPos = this->core->front_tracking_wheel->get();
                 if (DEBUG) {
                     printf("Encoder: L=%f, S=%f\n", this->LPos, this->SPos);
                 }
                 break;
             case OdomMode::RIGHTTW_FRONTTW_IMU:
-                this->RPos = (this->core->chassis_right_front->getPosition() +
-                              this->core->chassis_right_middle->getPosition() +
-                              this->core->chassis_right_back->getPosition()) / 3.0;
+                this->RPos = this->core->right_tracking_wheel->get();
                 this->SPos = this->core->front_tracking_wheel->get();
                 if (DEBUG) {
                     printf("Encoder: R=%f, S=%f\n", this->RPos, this->SPos);
@@ -191,31 +194,30 @@ void Odom::position_tracking() {
                 this->STrackRadius = -Constants::Robot::MIDDLE_ENCODER_DISTANCE.convert(meter) / 2;
                 this->LPos = (this->core->chassis_left_front->getPosition() +
                               this->core->chassis_left_middle->getPosition() +
-                              this->core->chassis_left_back->getPosition()) / 3.0;
+                              this->core->chassis_left_back->getPosition()) / 3.0
+                              * Constants::Robot::EXTERNAL_GEAR_RATIO;
+
                 this->RPos = (this->core->chassis_right_front->getPosition() +
                               this->core->chassis_right_middle->getPosition() +
-                              this->core->chassis_right_back->getPosition()) / 3.0;
-                this->SPos = this->core->front_tracking_wheel->get();
+                              this->core->chassis_right_back->getPosition()) / 3.0
+                              * Constants::Robot::EXTERNAL_GEAR_RATIO;
+                this->SPos = this->core->back_tracking_wheel->get();
                 if (DEBUG) {
                     printf("Encoder: L=%f, R=%f, S=%f\n", this->LPos, this->RPos, this->SPos);
                 }
                 break;
             case OdomMode::LEFTTW_BACKTW_IMU:
                 this->STrackRadius = -Constants::Robot::MIDDLE_ENCODER_DISTANCE.convert(meter) / 2;
-                this->LPos = (this->core->chassis_left_front->getPosition() +
-                              this->core->chassis_left_middle->getPosition() +
-                              this->core->chassis_left_back->getPosition()) / 3.0;
-                this->SPos = this->core->front_tracking_wheel->get();
+                this->LPos = this->core->left_tracking_wheel->get();
+                this->SPos = this->core->back_tracking_wheel->get();
                 if (DEBUG) {
                     printf("Encoder: L=%f, S=%f\n", this->LPos, this->SPos);
                 }
                 break;
             case OdomMode::RIGHTTW_BACKTW_IMU:
                 this->STrackRadius = -Constants::Robot::MIDDLE_ENCODER_DISTANCE.convert(meter) / 2;
-                this->RPos = (this->core->chassis_right_front->getPosition() +
-                              this->core->chassis_right_middle->getPosition() +
-                              this->core->chassis_right_back->getPosition()) / 3.0;
-                this->SPos = this->core->front_tracking_wheel->get();
+                this->RPos = this->core->right_tracking_wheel->get();
+                this->SPos = this->core->back_tracking_wheel->get();
                 if (DEBUG) {
                     printf("Encoder: R=%f, S=%f\n", this->RPos, this->SPos);
                 }
@@ -260,7 +262,7 @@ void Odom::position_tracking() {
                 this->odometry_mode == OdomMode::MOTOR_BACKTW_IMU ||
                 this->odometry_mode == OdomMode::LEFTTW_FRONTTW_IMU ||
                 this->odometry_mode == OdomMode::LEFTTW_BACKTW_IMU
-            ) {
+            ) { // if left tracking wheel available
                 this->deltaYLocal  = this->deltaDistL;
             } 
             else if (this->odometry_mode == OdomMode::RIGHTTW_FRONTTW_IMU ||
@@ -270,11 +272,22 @@ void Odom::position_tracking() {
         }
         //Else, caluclate the new local position
         else {
-        //Calculate the changes in the X and Y values (meters)
-
-        // The calculation assumes that the middle tracking wheel is at the front of the machine
+            //Calculate the changes in the X and Y values (meters)
+            // The calculation assumes that the middle tracking wheel is at the front of the machine
             this->deltaXLocal  = 2 * sin(this->deltaTheta / 2.0) * ((this->deltaDistS / this->deltaTheta) - this->STrackRadius);
-            this->deltaYLocal  = 2 * sin(this->deltaTheta / 2.0) * ((this->deltaDistR / this->deltaTheta) + this->RTrackRadius);
+            if (this->odometry_mode == OdomMode::MOTOR_IMU ||
+                this->odometry_mode == OdomMode::MOTOR_FRONTTW_IMU ||
+                this->odometry_mode == OdomMode::MOTOR_BACKTW_IMU ||
+                this->odometry_mode == OdomMode::LEFTTW_FRONTTW_IMU ||
+                this->odometry_mode == OdomMode::LEFTTW_BACKTW_IMU
+            ) { // if left tracking wheel available
+                this->deltaYLocal  = 2 * sin(this->deltaTheta / 2.0) * ((this->deltaDistL / this->deltaTheta) + this->LTrackRadius);
+            } 
+            else if (this->odometry_mode == OdomMode::RIGHTTW_FRONTTW_IMU ||
+                     this->odometry_mode == OdomMode::RIGHTTW_BACKTW_IMU) {
+                this->deltaYLocal  = 2 * sin(this->deltaTheta / 2.0) * ((this->deltaDistR / this->deltaTheta) + this->RTrackRadius);
+            }
+            
         }
 
         //The average angle of the robot during it's arc (RADIANS)
