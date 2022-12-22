@@ -1,7 +1,10 @@
+#include "algorithms/pure_pursuit/pure_pursuit.h"
+
 using namespace okapi;
 
 class Chassis {
     public:
+        Chassis(struct Core* core);
         Chassis(struct Core* core, Odom* odom);
         void setBrakeMode(AbstractMotor::brakeMode brake_mode);
 
@@ -25,6 +28,7 @@ class Chassis {
         void tareSensors();
 
         // driver control functions
+        float skim(float v);
         void cheezyDrive(float throttle, float turn);
     private:
         // translational PID constants
@@ -44,6 +48,7 @@ class Chassis {
 
         struct Core* core;
         Odom* odom;
+        bool odom_enabled;
         AbstractMotor::gearset motor_gearset;
         float maximum_velocity;
 

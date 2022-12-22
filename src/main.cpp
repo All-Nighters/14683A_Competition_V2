@@ -16,7 +16,7 @@ okapi::Motor        intake               = okapi::Motor(Configuration::Motors::I
 okapi::Motor        roller               = okapi::Motor(Configuration::Motors::ROLLER);
 pros::ADIDigitalOut expansion            = pros::ADIDigitalOut(Configuration::Analog::EXPANSION);
 // sensors
-okapi::ADIEncoder   left_tracking_wheel       = okapi::ADIEncoder(Configuration::Analog::ODOMETRY[0], Configuration::Analog::ODOMETRY[1], false);
+okapi::ADIEncoder   left_tracking_wheel  = okapi::ADIEncoder(Configuration::Analog::ODOMETRY[0], Configuration::Analog::ODOMETRY[1], false);
 pros::Imu           imu_first            = pros::Imu(Configuration::Analog::IMU[0]);
 pros::Imu           imu_second           = pros::Imu(Configuration::Analog::IMU[1]);
 
@@ -91,6 +91,11 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-    Odom odometry = Odom(&core, OdomMode::LEFTTW_FRONTTW_IMU);
-    Chassis chassis = Chassis(&core, &odometry);
+    // Odom odometry = Odom(&core, OdomMode::LEFTTW_FRONTTW_IMU);
+    Chassis chassis = Chassis(&core);
+	while (true) {
+		// chassis.moveVelocity(200);
+		chassis.cheezyDrive(core.controller->getAnalog(okapi::ControllerAnalog::leftY), core.controller->getAnalog(okapi::ControllerAnalog::rightX));
+		pros::delay(100);
+	}
 }

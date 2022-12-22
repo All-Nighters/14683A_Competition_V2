@@ -4,9 +4,21 @@
  * @brief Construct a new Chassis:: Chassis object
  * 
  */
+Chassis::Chassis(struct Core* core) {
+    this->core = core;
+    this->odom_enabled = false;
+    this->motor_gearset = AbstractMotor::gearset::blue;
+    this->maximum_velocity = 600;
+}
+
+/**
+ * @brief Construct a new Chassis:: Chassis object
+ * 
+ */
 Chassis::Chassis(struct Core* core, Odom* odom) {
     this->core = core;
     this->odom = odom;
+    this->odom_enabled = true;
     this->motor_gearset = AbstractMotor::gearset::blue;
     this->maximum_velocity = 600;
 }
@@ -43,6 +55,7 @@ void Chassis::setBrakeMode(okapi::AbstractMotor::brakeMode brake_mode) {
  * @param vel velocity
  */
 void Chassis::moveVelocity(float vel) {
+    vel = vel / 600.0 * 200;
     this->core->chassis_left_front  ->moveVelocity(vel);
     this->core->chassis_left_middle ->moveVelocity(vel);
     this->core->chassis_left_back   ->moveVelocity(vel);
@@ -58,12 +71,14 @@ void Chassis::moveVelocity(float vel) {
  * @param right_vel right velocity
  */
 void Chassis::moveVelocity(float left_vel, float right_vel) {
+    left_vel = left_vel / 600.0 * 200;
+    right_vel = right_vel / 600.0 * 200;
     this->core->chassis_left_front  ->moveVelocity(left_vel);
-    this->core->chassis_left_middle ->moveVelocity(left_vel);
-    this->core->chassis_left_back   ->moveVelocity(left_vel);
+    // this->core->chassis_left_middle ->moveVelocity(left_vel);
+    // this->core->chassis_left_back   ->moveVelocity(left_vel);
     this->core->chassis_right_front ->moveVelocity(right_vel);
-    this->core->chassis_right_middle->moveVelocity(right_vel);
-    this->core->chassis_right_back  ->moveVelocity(right_vel);
+    // this->core->chassis_right_middle->moveVelocity(right_vel);
+    // this->core->chassis_right_back  ->moveVelocity(right_vel);
 }
 
 /**
@@ -188,6 +203,10 @@ void Chassis::turnAngle(float angle) {
  */
 
 void Chassis::faceAngle(float angle) {
+    if (!this->odom_enabled) { // odometry not configured
+        printf("Cannot run faceAngle because odometry is not enabled\n");
+        return;
+    }
     RobotPosition robot_state = this->odom->getState();
     float target_angle = angle;
     float prev_error = formatAngle(target_angle) - formatAngle(robot_state.theta);
@@ -223,7 +242,7 @@ void Chassis::faceAngle(float angle) {
  * @return left track motor position reading
  */
 float Chassis::getLeftPosition() {
-    return (this->core->chassis_left_front->getPosition() + this->core->chassis_left_middle->getPosition()  + this->core->chassis_left_back->getPosition()) / 3.0;
+    return (this->core->chassis_left_front->getPosition() + this->core->chassis_left_middle->getPosition()  + this->core->chassis_left_back->getPosition());
 }
 
 /**
@@ -232,21 +251,35 @@ float Chassis::getLeftPosition() {
  * @return right track motor position reading
  */
 float Chassis::getRightPosition() {
-    return (this->core->chassis_right_front->getPosition() + this->core->chassis_right_middle->getPosition()  + this->core->chassis_right_back->getPosition()) / 3.0;
+    return (this->core->chassis_right_front->getPosition() + this->core->chassis_right_middle->getPosition()  + this->core->chassis_right_back->getPosition());
+}
+
+float Chassis::skim(float v) {
+    float gain = 1;
+    if (v > 1.0) {
+        return -((v - 1.0) * gain);
+    }   
+    else if (v < -1.0) {
+        return -((v + 1.0) * gain);
+    }
+        
+    return 0;
 }
 
 /**
  * @brief Cheezy driver control
  * 
- * @param throttle forward power (-127 to 127)
- * @param turn turn power (-127 to 127)
+ * @param throttle forward power (-1 to 1)
+ * @param turn turn power (-1 to 1)
  */
 void Chassis::cheezyDrive(float throttle, float turn) {
-    float turn_vel = (turn / 127.0) * abs(throttle / 127.0) * this->maximum_velocity;
-    float forward_vel = throttle * this->maximum_velocity;
+    float t_left = throttle + turn;
+    float t_right = throttle - turn;
 
+    float left = t_left + skim(t_right);
+    float right = t_right + skim(t_left);
     this->moveVelocity(
-        clamp(forward_vel + turn_vel, -this->maximum_velocity, this->maximum_velocity), 
-        clamp(forward_vel - turn_vel, -this->maximum_velocity, this->maximum_velocity)
+        clamp(left * this->maximum_velocity, -this->maximum_velocity, this->maximum_velocity), 
+        clamp(right * this->maximum_velocity, -this->maximum_velocity, this->maximum_velocity)
     );
 }

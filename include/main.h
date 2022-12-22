@@ -121,6 +121,8 @@ void opcontrol(void);
  */
 #include <iostream>
 #include <math.h>
+#include <vector>
+
 #endif
 
 #endif  // _PROS_MAIN_H_

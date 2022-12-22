@@ -1,7 +1,8 @@
 #define DEBUG true
 #include "main.h"
 
-Odom::Odom(struct Core* core, OdomMode mode) {
+Odom::Odom(struct Core* core, OdomMode mode) { 
+    // Note: make sure all sensors required by the odometry mode are plugged in
     this->odometry_mode = mode;
     this->WHEEL_RADIUS = Constants::Robot::WHEEL_DIAMETER.convert(meter) / 2;
     this->LTrackRadius = Constants::Robot::TRACK_LENGTH.convert(meter) / 2;
