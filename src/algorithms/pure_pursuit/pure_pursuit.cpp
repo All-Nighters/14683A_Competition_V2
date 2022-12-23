@@ -7,6 +7,7 @@
  */
 PurePursuit::PurePursuit(float max_velocity) {
     this->max_velocity = max_velocity;
+    this->look_ahead_radius = Constants::PurePursuit::LOOKAHEAD_RADIUS;
 }
 
 /**
@@ -17,6 +18,7 @@ PurePursuit::PurePursuit(float max_velocity) {
  */
 PurePursuit::PurePursuit(std::vector<Coordinates> input_path, float max_velocity) {
     this->max_velocity = max_velocity;
+    this->look_ahead_radius = Constants::PurePursuit::LOOKAHEAD_RADIUS;
     this->arrived = false;
     for (Coordinates point : input_path) {
         this->path.push_back(point);

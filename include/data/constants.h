@@ -14,6 +14,9 @@ namespace Constants {
 		};
 	}
 
+	namespace PurePursuit {
+		inline float LOOKAHEAD_RADIUS = 10;
+	}
 	namespace GraphicalInterface {
 		inline int SCREEN_WIDTH  = 480;
 		inline int SCREEN_HEIGHT = 272 - 30;
