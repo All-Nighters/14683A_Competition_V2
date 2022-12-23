@@ -1,9 +1,20 @@
 #include "algorithms/pure_pursuit/pure_pursuit.h"
 
+/**
+ * @brief Construct a new Pure Pursuit:: Pure Pursuit object
+ * 
+ * @param max_velocity maximum path following velocity
+ */
 PurePursuit::PurePursuit(float max_velocity) {
     this->max_velocity = max_velocity;
 }
 
+/**
+ * @brief Construct a new Pure Pursuit:: Pure Pursuit object
+ * 
+ * @param input_path path to follow
+ * @param max_velocity maximum path following velocity
+ */
 PurePursuit::PurePursuit(std::vector<Coordinates> input_path, float max_velocity) {
     this->max_velocity = max_velocity;
     this->arrived = false;
@@ -12,17 +23,35 @@ PurePursuit::PurePursuit(std::vector<Coordinates> input_path, float max_velocity
     }
 }
 
+/**
+ * @brief Check if the robot has reached the destination
+ * 
+ * @return true 
+ * @return false 
+ */
 bool PurePursuit::is_arrived() {
     return this->arrived;
 }
 
+/**
+ * @brief Set the path to follow
+ * 
+ * @param input_path path to follow
+ */
 void PurePursuit::set_path(std::vector<Coordinates> input_path) {
     this->arrived = false;
+    this->path.clear();
     for (Coordinates point : input_path) {
         this->path.push_back(point);
     }
 }
 
+/**
+ * @brief Find the index number of the closest waypoint to the robot
+ * 
+ * @param position robot position
+ * @returns index 
+ */
 int PurePursuit::closest(RobotPosition position) {
     float x_dist = this->path[0].get_x() - position.x_pct;
     float y_dist = this->path[0].get_y() - position.y_pct;
@@ -40,6 +69,12 @@ int PurePursuit::closest(RobotPosition position) {
     return min_idx;
 }
 
+/**
+ * @brief Determine the look ahead point
+ * 
+ * @param position robot position
+ * @returns look ahead point 
+ */
 Coordinates PurePursuit::getLookAheadPoint(RobotPosition position) {
     float x_dist = this->path[this->path.size()-1].get_x() - position.x_pct;
     float y_dist = this->path[this->path.size()-1].get_y() - position.y_pct;
@@ -102,6 +137,13 @@ Coordinates PurePursuit::getLookAheadPoint(RobotPosition position) {
 
 }
 
+/**
+ * @brief Convert absolute coordinate to coordinate local to the robot
+ * 
+ * @param position robot position
+ * @param point point to convert
+ * @returns local coordinate 
+ */
 Coordinates PurePursuit::absToLocal(RobotPosition position, Coordinates point) {
     Coordinates self_coordinate = Coordinates(position.x_pct, position.y_pct, position.theta);
     float xDist = point.get_x() - position.x_pct;
@@ -114,6 +156,12 @@ Coordinates PurePursuit::absToLocal(RobotPosition position, Coordinates point) {
     return Coordinates(newX, newY, position.theta);
 }
 
+/**
+ * @brief One step of the pure pursuit algorithm
+ * 
+ * @param position robot position
+ * @returns left and right track velocity pair 
+ */
 ChassisVelocityPair PurePursuit::step(RobotPosition position) {
     ChassisVelocityPair velocity_pair;
     if (this->closest(position) != this->path.size()-1) {
