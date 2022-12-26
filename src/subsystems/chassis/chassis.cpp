@@ -6,6 +6,7 @@
  */
 Chassis::Chassis(struct Core* core) {
     this->core = core;
+    this->pure_pursuit = PurePursuit();
     this->odom_enabled = false;
     this->motor_gearset = AbstractMotor::gearset::blue;
     this->maximum_velocity = 600;
@@ -17,6 +18,7 @@ Chassis::Chassis(struct Core* core) {
  */
 Chassis::Chassis(struct Core* core, Odom* odom) {
     this->core = core;
+    this->pure_pursuit = PurePursuit();
     this->odom = odom;
     this->odom_enabled = true;
     this->motor_gearset = AbstractMotor::gearset::blue;
@@ -74,11 +76,11 @@ void Chassis::moveVelocity(float left_vel, float right_vel) {
     left_vel = left_vel / 600.0 * 200;
     right_vel = right_vel / 600.0 * 200;
     this->core->chassis_left_front  ->moveVelocity(left_vel);
-    // this->core->chassis_left_middle ->moveVelocity(left_vel);
-    // this->core->chassis_left_back   ->moveVelocity(left_vel);
+    this->core->chassis_left_middle ->moveVelocity(left_vel);
+    this->core->chassis_left_back   ->moveVelocity(left_vel);
     this->core->chassis_right_front ->moveVelocity(right_vel);
-    // this->core->chassis_right_middle->moveVelocity(right_vel);
-    // this->core->chassis_right_back  ->moveVelocity(right_vel);
+    this->core->chassis_right_middle->moveVelocity(right_vel);
+    this->core->chassis_right_back  ->moveVelocity(right_vel);
 }
 
 /**
@@ -236,6 +238,86 @@ void Chassis::faceAngle(float angle) {
         
 }
 
+/**
+ * @brief face the robot to a specific coordinate in percent
+ * 
+ * @param xPercent x coordinate of the target in percents
+ * @param yPercent y coordinate of the target in percents
+ */
+void Chassis::faceCoordinate(float xPercent, float yPercent) {
+    RobotPosition position = this->odom->getState();
+    float xDist = xPercent - position.x_pct;
+    float yDist = yPercent - position.y_pct;
+
+    if (abs(xDist) < 0.1 && abs(yDist) < 0.1) {
+        return;
+    }
+
+    float dist = sqrt(xDist*xDist + yDist*yDist);
+
+    float relativeAngle;
+
+    if (xDist > 0 && yDist > 0) { // first quadrant
+        relativeAngle = atan(abs(yDist/xDist)) * 180 / M_PI;
+    }
+    else if (xDist > 0 && yDist < 0) { // second quadrant
+        relativeAngle = -atan(abs(yDist/xDist)) * 180 / M_PI;
+    }
+    else if (xDist < 0 && yDist < 0) { // third quadrant
+        relativeAngle = -180 + (atan(abs(yDist/xDist)) * 180 / M_PI);
+    }
+    else if (xDist < 0 && yDist > 0) { // fourth quadrant
+        relativeAngle = 180 - (atan(abs(yDist/xDist)) * 180 / M_PI);
+    }
+    else if (xDist == 0 && yDist != 0) {
+        relativeAngle = (yDist / abs(yDist))*90;
+    }
+    else if (xDist != 0 && yDist == 0) {
+        relativeAngle = 0;
+    } else {
+        return;
+    }
+
+    float faceAngle;
+
+    faceAngle = formatAngle(relativeAngle - position.theta);
+
+    turnAngle(faceAngle);
+}
+
+/**
+ * Move the robot to a specific coordinate in the field. The function may be inaccurate over long distances.
+ * 
+ * @param xPercent x coordinate of the target
+ * @param yPercent y coordinate of the target
+ */
+void Chassis::simpleMoveToPoint(float xPercent, float yPercent) {
+    RobotPosition position = this->odom->getState();
+    float xDist = xPercent - position.x_pct;
+    float yDist = yPercent - position.y_pct;
+    float dist = sqrt(xDist*xDist + yDist*yDist);
+
+    this->faceCoordinate(xPercent, yPercent);
+    this->moveDistance(dist);
+}
+
+/**
+ * Move the robot backwards to a specific coordinate in the field. The function may be inaccurate over long distances.
+ * 
+ * @param xPercent x coordinate of the target
+ * @param yPercent y coordinate of the target
+ */
+void Chassis::simpleMoveToPointBackwards(float xPercent, float yPercent) {
+    RobotPosition position = this->odom->getState();
+    float xDist = xPercent - position.x_pct;
+    float yDist = yPercent - position.y_pct;
+    float dist = sqrt(xDist*xDist + yDist*yDist);
+
+    this->faceCoordinate(position.x_pct - xDist, position.y_pct - yDist);
+    this->moveDistance(-dist);
+    
+
+}
 /**
  * @brief Get left track motor position reading
  * 

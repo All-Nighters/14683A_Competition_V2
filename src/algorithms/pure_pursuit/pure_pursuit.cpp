@@ -1,3 +1,4 @@
+#include "main.h"
 #include "algorithms/pure_pursuit/pure_pursuit.h"
 
 /**
@@ -162,9 +163,10 @@ Coordinates PurePursuit::absToLocal(RobotPosition position, Coordinates point) {
  * @brief One step of the pure pursuit algorithm
  * 
  * @param position robot position
+ * @param reverse whether the robot should pursue the path backwards
  * @returns left and right track velocity pair 
  */
-ChassisVelocityPair PurePursuit::step(RobotPosition position) {
+ChassisVelocityPair PurePursuit::step(RobotPosition position, bool reverse) {
     ChassisVelocityPair velocity_pair;
     if (this->closest(position) != this->path.size()-1) {
         this->arrived = false;
@@ -172,8 +174,14 @@ ChassisVelocityPair PurePursuit::step(RobotPosition position) {
         Coordinates local_look_ahead = this->absToLocal(position, look_ahead);
 
         float curv = (2*local_look_ahead.get_x()) / ((this->look_ahead_radius * this->look_ahead_radius));
-        velocity_pair.left_v = this->max_velocity*(1+(curv*Constants::Robot::TRACK_LENGTH.convert(meter)/2));
-        velocity_pair.left_v = this->max_velocity*(1-(curv*Constants::Robot::TRACK_LENGTH.convert(meter)/2));
+        if (reverse) {
+            velocity_pair.left_v = -(this->max_velocity*(1+(curv*Constants::Robot::TRACK_LENGTH.convert(meter)/2)));
+            velocity_pair.left_v = -(this->max_velocity*(1-(curv*Constants::Robot::TRACK_LENGTH.convert(meter)/2)));
+        } else {
+            velocity_pair.left_v = this->max_velocity*(1+(curv*Constants::Robot::TRACK_LENGTH.convert(meter)/2));
+            velocity_pair.left_v = this->max_velocity*(1-(curv*Constants::Robot::TRACK_LENGTH.convert(meter)/2));
+        }
+        
     } else {
         velocity_pair.left_v = 0;
         velocity_pair.right_v = 0;

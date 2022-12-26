@@ -93,6 +93,7 @@ void autonomous() {}
 void opcontrol() {
     // Odom odometry = Odom(&core, OdomMode::LEFTTW_FRONTTW_IMU);
     Chassis chassis = Chassis(&core);
+	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
 	while (true) {
 		// chassis.moveVelocity(200);
 		chassis.cheezyDrive(core.controller->getAnalog(okapi::ControllerAnalog::leftY), core.controller->getAnalog(okapi::ControllerAnalog::rightX));

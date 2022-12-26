@@ -15,7 +15,7 @@ class Chassis {
         void moveVoltage(float left_volt, float right_volt);
 
         // autonomous helper functions
-        void moveDistance(float pct, float max_voltage);
+        void moveDistance(float pct, float max_voltage = 12000);
         void turnAngle(float angle);
         void faceAngle(float angle);
         void faceCoordinate(float x, float y);
@@ -48,6 +48,7 @@ class Chassis {
 
         struct Core* core;
         Odom* odom;
+        PurePursuit pure_pursuit;
         bool odom_enabled;
         AbstractMotor::gearset motor_gearset;
         float maximum_velocity;
