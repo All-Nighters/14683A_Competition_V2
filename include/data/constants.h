@@ -16,6 +16,12 @@ namespace Constants {
 
 	namespace PurePursuit {
 		inline float LOOKAHEAD_RADIUS = 10;
+		inline float DISPLACEMENT_P = 300;
+		inline float DISPLACEMENT_I = 0.01;
+		inline float DISPLACEMENT_D = 500;
+		inline float ROTATION_P = 300;
+		inline float ROTATION_I = 0.01;
+		inline float ROTATION_D = 100;
 	}
 	namespace GraphicalInterface {
 		inline int SCREEN_WIDTH  = 480;

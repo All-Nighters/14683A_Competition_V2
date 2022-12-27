@@ -16,7 +16,22 @@ class PurePursuit {
         bool arrived;
         float look_ahead_radius;
         float max_velocity;
+
+        // PID terms
+        float kP_displacement;
+        float kP_rotation;
+        float kI_displacement;
+        float kI_rotation;
+        float kD_displacement;
+        float kD_rotation;
+
+        float prev_displacement_error;
+        float prev_rotation_error;
+        float total_displacement_error;
+        float total_rotation_error;
         std::vector<Coordinates> path;
+        void init();
+        void reset_error();
         int closest(RobotPosition position);
         Coordinates getLookAheadPoint(RobotPosition position);
         Coordinates absToLocal(RobotPosition position, Coordinates point);

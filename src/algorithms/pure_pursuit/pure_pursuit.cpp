@@ -9,6 +9,8 @@
 PurePursuit::PurePursuit(float max_velocity) {
     this->max_velocity = max_velocity;
     this->look_ahead_radius = Constants::PurePursuit::LOOKAHEAD_RADIUS;
+
+    this->init();
 }
 
 /**
@@ -24,6 +26,34 @@ PurePursuit::PurePursuit(std::vector<Coordinates> input_path, float max_velocity
     for (Coordinates point : input_path) {
         this->path.push_back(point);
     }
+    this->init();
+}
+
+/**
+ * @brief Pure pursuit initialization function
+ * 
+ */
+void PurePursuit::init() {
+    this->reset_error();
+
+    this->kP_displacement = Constants::PurePursuit::DISPLACEMENT_P;
+    this->kI_displacement = Constants::PurePursuit::DISPLACEMENT_I;
+    this->kD_displacement = Constants::PurePursuit::DISPLACEMENT_D;
+
+    this->kP_rotation = Constants::PurePursuit::ROTATION_P;
+    this->kI_rotation = Constants::PurePursuit::ROTATION_I;
+    this->kD_rotation = Constants::PurePursuit::ROTATION_D;
+}
+
+/**
+ * @brief Reset recorded errors
+ * 
+ */
+void PurePursuit::reset_error() {
+    this->prev_displacement_error = 0;
+    this->prev_rotation_error = 0;
+    this->total_displacement_error = 0;
+    this->total_rotation_error = 0;
 }
 
 /**
@@ -173,18 +203,46 @@ ChassisVelocityPair PurePursuit::step(RobotPosition position, bool reverse) {
         Coordinates look_ahead = this->getLookAheadPoint(position);
         Coordinates local_look_ahead = this->absToLocal(position, look_ahead);
 
-        float curv = (2*local_look_ahead.get_x()) / ((this->look_ahead_radius * this->look_ahead_radius));
+        // if reversing is enabled, reverse the displacement error
+        float error_displacement        = reverse? -local_look_ahead.get_y() / this->look_ahead_radius
+                                                 :  local_look_ahead.get_y() / this->look_ahead_radius;
+        float error_rotation            = local_look_ahead.get_x() / this->look_ahead_radius;
+
+        float deriv_error_displacement  = error_displacement - this->prev_displacement_error;
+        float deriv_error_rotation      = error_rotation - this->prev_rotation_error;
+
+        this->total_displacement_error += error_displacement;
+        this->total_rotation_error     += error_rotation;
+
+        float forward  = this->kP_displacement * error_displacement +
+                         this->kI_displacement * this->total_displacement_error+
+                         this->kD_displacement * deriv_error_displacement;
+
+        float rotation = this->kP_rotation * error_rotation +
+                        this->kI_rotation * this->total_rotation_error+
+                        this->kD_rotation * deriv_error_rotation;
+        
+        this->prev_displacement_error = error_displacement;
+        this->prev_rotation_error = error_rotation;
+
+        // if reversing is enabled, reverse the control output
         if (reverse) {
-            velocity_pair.left_v = -(this->max_velocity*(1+(curv*Constants::Robot::TRACK_LENGTH.convert(meter)/2)));
-            velocity_pair.left_v = -(this->max_velocity*(1-(curv*Constants::Robot::TRACK_LENGTH.convert(meter)/2)));
+            velocity_pair.left_v = clamp(-(forward + rotation), -this->max_velocity, this->max_velocity);
+            velocity_pair.right_v = clamp(-(forward - rotation), -this->max_velocity, this->max_velocity);
         } else {
-            velocity_pair.left_v = this->max_velocity*(1+(curv*Constants::Robot::TRACK_LENGTH.convert(meter)/2));
-            velocity_pair.left_v = this->max_velocity*(1-(curv*Constants::Robot::TRACK_LENGTH.convert(meter)/2));
+            velocity_pair.left_v = clamp(forward + rotation, -this->max_velocity, this->max_velocity);
+            velocity_pair.right_v = clamp(forward - rotation, -this->max_velocity, this->max_velocity);
         }
         
     } else {
         velocity_pair.left_v = 0;
         velocity_pair.right_v = 0;
+
+        this->prev_displacement_error = 0;
+        this->prev_rotation_error = 0;
+        this->total_displacement_error = 0;
+        this->total_rotation_error = 0;
+
         this->arrived = true;
     }
     return velocity_pair;
