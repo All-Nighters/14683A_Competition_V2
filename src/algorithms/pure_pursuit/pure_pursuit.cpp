@@ -198,7 +198,7 @@ Coordinates PurePursuit::absToLocal(RobotPosition position, Coordinates point) {
  */
 ChassisVelocityPair PurePursuit::step(RobotPosition position, bool reverse) {
     ChassisVelocityPair velocity_pair;
-    if (this->closest(position) != this->path.size()-1) {
+    if (!this->arrived && this->closest(position) != this->path.size()-1) {
         this->arrived = false;
         Coordinates look_ahead = this->getLookAheadPoint(position);
         Coordinates local_look_ahead = this->absToLocal(position, look_ahead);
@@ -238,10 +238,7 @@ ChassisVelocityPair PurePursuit::step(RobotPosition position, bool reverse) {
         velocity_pair.left_v = 0;
         velocity_pair.right_v = 0;
 
-        this->prev_displacement_error = 0;
-        this->prev_rotation_error = 0;
-        this->total_displacement_error = 0;
-        this->total_rotation_error = 0;
+        this->reset_error();
 
         this->arrived = true;
     }

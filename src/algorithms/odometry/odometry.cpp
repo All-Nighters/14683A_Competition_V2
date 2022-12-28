@@ -286,7 +286,7 @@ void Odom::position_tracking() {
             } 
             else if (this->odometry_mode == OdomMode::RIGHTTW_FRONTTW_IMU ||
                      this->odometry_mode == OdomMode::RIGHTTW_BACKTW_IMU) {
-                this->deltaYLocal  = 2 * sin(this->deltaTheta / 2.0) * ((this->deltaDistR / this->deltaTheta) + this->RTrackRadius);
+                this->deltaYLocal  = 2 * sin(this->deltaTheta / 2.0) * ((this->deltaDistR / this->deltaTheta) - this->LTrackRadius);
             }
             
         }
