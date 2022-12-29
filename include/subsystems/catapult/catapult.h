@@ -5,6 +5,7 @@ class Catapult {
         void reposition();
         void set_boost(bool use_boost);
         void fire();
+        void wait_until_reloaded();
     private:
         struct Core* core;
         bool triggered;

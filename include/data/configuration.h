@@ -14,13 +14,18 @@ namespace Configuration {
         // accessories
         inline int INTAKE = 7;
         inline int ROLLER = 7;
+        inline int CATAPULT = 8;
     };
 
     namespace Analog {
-        inline std::uint8_t     EXPANSION          = ' ';
-        inline std::uint8_t     ODOMETRY[2]        = {' ', ' '};
-        inline std::uint8_t     IMU[2]             = {0, 0};
+        inline std::uint8_t     EXPANSION             = ' ';
+        inline std::uint8_t     ODOMETRY[2]           = {'A', 'B'};
+        inline std::uint8_t     IMU[2]                = {7, 8};
     };
+
+    namespace Digital {
+        inline std::uint8_t    CATAPULT_LOAD_SENSOR   = 'C';
+    }
 
     namespace Controls {
         inline ControllerAnalog FORWARD_AXIS       = ControllerAnalog::leftY;

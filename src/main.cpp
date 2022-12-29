@@ -14,11 +14,13 @@ okapi::Motor        chassis_right_back   = okapi::Motor(Configuration::Motors::C
 // accessories
 okapi::Motor        intake               = okapi::Motor(Configuration::Motors::INTAKE);
 okapi::Motor        roller               = okapi::Motor(Configuration::Motors::ROLLER);
+okapi::Motor        catapult             = okapi::Motor(Configuration::Motors::CATAPULT);
 pros::ADIDigitalOut expansion            = pros::ADIDigitalOut(Configuration::Analog::EXPANSION);
 // sensors
-okapi::ADIEncoder   middle_tracking_wheel  = okapi::ADIEncoder(Configuration::Analog::ODOMETRY[0], Configuration::Analog::ODOMETRY[1], false);
+okapi::ADIEncoder   middle_tracking_wheel= okapi::ADIEncoder(Configuration::Analog::ODOMETRY[0], Configuration::Analog::ODOMETRY[1], false);
 pros::Imu           imu_first            = pros::Imu(Configuration::Analog::IMU[0]);
 pros::Imu           imu_second           = pros::Imu(Configuration::Analog::IMU[1]);
+pros::ADIDigitalIn catapult_load_sensor  = pros::ADIDigitalIn(Configuration::Digital::CATAPULT_LOAD_SENSOR);
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -40,10 +42,12 @@ void initialize() {
 	core.intake               = &intake;
 	core.roller               = &roller;
 	core.expansion            = &expansion;
+	core.catapult_motor       = &catapult;
 	// sensors
-	core.middle_tracking_wheel  = &middle_tracking_wheel;
+	core.middle_tracking_wheel= &middle_tracking_wheel;
 	core.imu_first            = &imu_first;
     core.imu_second           = &imu_second;
+	core.catapult_load_sensor = &catapult_load_sensor;
 }
 
 /**
@@ -91,12 +95,16 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-    // Odom odometry = Odom(&core, OdomMode::LEFTTW_FRONTTW_IMU);
+    // Odom odometry = Odom(&core, OdomMode::MIDDLETW_IMU);
     Chassis chassis = Chassis(&core);
 	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
+	Catapult cata = Catapult(&core);
 	while (true) {
-		// chassis.moveVelocity(200);
 		chassis.cheezyDrive(core.controller->getAnalog(okapi::ControllerAnalog::leftY), core.controller->getAnalog(okapi::ControllerAnalog::rightX));
-		pros::delay(100);
+		if (core.controller->getDigital(Configuration::Controls::SHOOT_BUTTON)) {
+			cata.fire();
+			cata.wait_until_reloaded();
+		}
+		pros::delay(10);
 	}
 }

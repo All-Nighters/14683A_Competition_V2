@@ -10,9 +10,8 @@ Catapult::Catapult(struct Core* core) {
     this->voltage = 8000;
     this->core = core;
     this->reposition();
-    this->shooting_task = std::move(std::make_unique<pros::Task>(this->shooting_loop_trampoline, this, "shooting loop"));
     this->core->catapult_motor->setBrakeMode(okapi::AbstractMotor::brakeMode::hold);
-    this->reposition();
+    this->shooting_task = std::move(std::make_unique<pros::Task>(this->shooting_loop_trampoline, this, "shooting loop"));
 }
 /**
  * @brief Destroy the Catapult:: Catapult object
@@ -55,6 +54,12 @@ void Catapult::fire() {
     this->triggered = true;
 }
 
+void Catapult::wait_until_reloaded() {
+    while (triggered) {
+        ;
+    }
+}
+
 /**
  * @brief Trampoline function for shooting background task
  * 
@@ -75,13 +80,13 @@ void Catapult::shooting_loop_trampoline(void* iparam) {
 void Catapult::shooting_loop() {
     while (true) {
         if (this->triggered) {
-            this->triggered = false;
             // rotate until it is not loaded
             while (this->core->catapult_load_sensor->get_value() != 0) {
                 this->core->catapult_motor->moveVoltage(this->voltage);
                 pros::delay(20);
             }
             this->reposition();
+            this->triggered = false;
         }
         pros::delay(20);
     }
