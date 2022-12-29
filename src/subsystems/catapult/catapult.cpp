@@ -47,16 +47,22 @@ void Catapult::set_boost(bool use_boost) {
 }
 
 /**
- * @brief Request to shoot
+ * @brief Request to shoot.
  * 
+ * To shoot synchronously, add wait_until_reloaded() right after
+ * calling fire().
  */
 void Catapult::fire() {
     this->triggered = true;
 }
 
+/**
+ * @brief Wait until the catapult is reloaded
+ * 
+ */
 void Catapult::wait_until_reloaded() {
-    while (triggered) {
-        ;
+    while (this->triggered) {
+        pros::delay(10);
     }
 }
 

@@ -33,19 +33,19 @@ class Chassis {
         void cheezyDrive(float throttle, float turn);
     private:
         // translational PID constants
-        float Tp;
-        float Ti;
-        float Td;
+        const float Tp = 1;
+        const float Ti = 0;
+        const float Td = 0;
 
         // rotational PID constants
-        float Rp;
-        float Ri;
-        float Rd;
+        const float Rp = 1;
+        const float Ri = 0;
+        const float Rd = 0;
 
         // directional PID constants (help driving straight)
-        float Dp;
-        float Di;
-        float Dd;
+        const float Dp = 1;
+        const float Di = 0;
+        const float Dd = 0;
 
         struct Core* core;
         Odom* odom;
