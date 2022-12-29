@@ -50,6 +50,7 @@
 // utilities
 #include "utilities/coordinates.h"
 #include "utilities/math_funcs.h"
+#include "utilities/math.h"
 
 // algorithms
 #include "algorithms/odometry/odometry.h"
@@ -59,6 +60,7 @@
 #include "subsystems/chassis/chassis.h"
 #include "subsystems/intake/intake.h"
 #include "subsystems/roller/roller.h"
+#include "subsystems/vision/vision.h"
 #include "subsystems/catapult/catapult.h"
 #include "subsystems/expansion/expansion.h"
 #include "subsystems/blocker/blocker.h"
