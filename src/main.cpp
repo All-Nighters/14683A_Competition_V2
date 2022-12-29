@@ -98,13 +98,14 @@ void opcontrol() {
     // Odom odometry = Odom(&core, OdomMode::MIDDLETW_IMU);
     Chassis chassis = Chassis(&core);
 	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
-	Catapult cata = Catapult(&core);
+	// Catapult cata = Catapult(&core);
 	while (true) {
-		chassis.cheezyDrive(core.controller->getAnalog(okapi::ControllerAnalog::leftY), core.controller->getAnalog(okapi::ControllerAnalog::rightX));
-		if (core.controller->getDigital(Configuration::Controls::SHOOT_BUTTON)) {
-			cata.fire();
-			cata.wait_until_reloaded();
-		}
+		// chassis.moveVelocity(400, -400);
+		chassis.cheezyDrive(core.controller->getAnalog(okapi::ControllerAnalog::leftY), 0.4*core.controller->getAnalog(okapi::ControllerAnalog::rightX));
+		// if (core.controller->getDigital(Configuration::Controls::SHOOT_BUTTON)) {
+		// 	cata.fire();
+		// 	cata.wait_until_reloaded();
+		// }
 		pros::delay(10);
 	}
 }

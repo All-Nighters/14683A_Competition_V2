@@ -364,6 +364,9 @@ float Chassis::skim(float v) {
     return 0;
 }
 
+float Chassis::exponential_filter(float input) {
+    return (1.2*pow(1.04535, 100*input) - 1.2 + 0.3*input) / 100;
+}
 /**
  * @brief Cheezy driver control
  * 
@@ -371,13 +374,33 @@ float Chassis::skim(float v) {
  * @param turn turn power (-1 to 1)
  */
 void Chassis::cheezyDrive(float throttle, float turn) {
-    float t_left = throttle + turn;
-    float t_right = throttle - turn;
 
-    float left = t_left + skim(t_right);
-    float right = t_right + skim(t_left);
-    this->moveVelocity(
-        clamp(left * this->maximum_velocity, -this->maximum_velocity, this->maximum_velocity), 
-        clamp(right * this->maximum_velocity, -this->maximum_velocity, this->maximum_velocity)
-    );
+    // apply exponential filter on joystick values
+    if (throttle > 0) {
+        throttle = this->exponential_filter(throttle);
+    } else {
+        throttle = -this->exponential_filter(-throttle);
+    }
+
+    if (turn > 0) {
+        turn = this->exponential_filter(turn);
+    } else {
+        turn = -this->exponential_filter(-turn);
+    }
+
+    // input threashold
+    if (throttle < 0.1 && turn < 0.1) {
+        this->moveVelocity(0);
+    }
+    else {
+        float t_left = throttle + turn;
+        float t_right = throttle - turn;
+
+        float left = t_left + skim(t_right);
+        float right = t_right + skim(t_left);
+        this->moveVelocity(
+            clamp(left * this->maximum_velocity, -this->maximum_velocity, this->maximum_velocity), 
+            clamp(right * this->maximum_velocity, -this->maximum_velocity, this->maximum_velocity)
+        );
+    }
 }

@@ -5,12 +5,12 @@ using namespace okapi;
 namespace Configuration {
     namespace Motors {
         // chassis
-        inline int CHASSIS_LEFT_FRONT   = 1;
+        inline int CHASSIS_LEFT_FRONT   = -1;
         inline int CHASSIS_LEFT_MIDDLE  = 2;
-        inline int CHASSIS_LEFT_BACK    = 3;
-        inline int CHASSIS_RIGHT_FRONT  = -4;
+        inline int CHASSIS_LEFT_BACK    = -3;
+        inline int CHASSIS_RIGHT_FRONT  = 4;
         inline int CHASSIS_RIGHT_MIDDLE = -5;
-        inline int CHASSIS_RIGHT_BACK   = -6;
+        inline int CHASSIS_RIGHT_BACK   = 6;
         // accessories
         inline int INTAKE = 7;
         inline int ROLLER = 7;

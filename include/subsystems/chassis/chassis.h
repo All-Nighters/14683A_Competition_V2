@@ -59,4 +59,6 @@ class Chassis {
         ADIEncoder* midTW;
         pros::IMU* imu1;
         pros::IMU* imu2;
+
+        float exponential_filter(float input);
 };
