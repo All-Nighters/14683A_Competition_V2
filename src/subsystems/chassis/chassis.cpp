@@ -365,7 +365,7 @@ float Chassis::skim(float v) {
 }
 
 float Chassis::exponential_filter(float input) {
-    return (1.2*pow(1.04535, 100*input) - 1.2 + 0.3*input) / 100;
+    return clamp((1.2*pow(1.045315, 100*input) - 1.2 + 0.3*input) / 100, 0, 1);
 }
 /**
  * @brief Cheezy driver control
