@@ -12,8 +12,12 @@ Odom::Odom(struct Core* core, OdomMode mode) {
     this->reset_variables();
     this->tare_sensors();
     
+    odom_task = std::move(std::make_unique<pros::Task>(this->start_odom, this, "Odom"));
+}
 
-    pros::Task loop(this->start_odom, this, "Odom");
+Odom::~Odom() {
+    odom_task->remove();
+    odom_task.reset(nullptr);
 }
 
 void Odom::start_odom(void* iparam){

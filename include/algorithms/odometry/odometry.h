@@ -19,6 +19,7 @@ enum class OdomMode {
 class Odom {
     public:
         Odom(struct Core* core, OdomMode mode);
+        ~Odom();
         RobotPosition getState();
         void setState(QLength x, QLength y, QAngle angle);
         void setState(float x, float y, float angle);
@@ -75,4 +76,5 @@ class Odom {
         void tare_sensors();
         static void start_odom(void* iparam);
         void position_tracking();
+        std::unique_ptr<pros::Task> odom_task {nullptr};
 };

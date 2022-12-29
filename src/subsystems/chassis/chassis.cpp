@@ -3,6 +3,7 @@
 /**
  * @brief Construct a new Chassis:: Chassis object
  * 
+ * @param core Core structure pointer
  */
 Chassis::Chassis(struct Core* core) {
     this->core = core;
@@ -15,6 +16,8 @@ Chassis::Chassis(struct Core* core) {
 /**
  * @brief Construct a new Chassis:: Chassis object
  * 
+ * @param core Core structure pointer
+ * @param odom Odom structure pointer
  */
 Chassis::Chassis(struct Core* core, Odom* odom) {
     this->core = core;
@@ -23,6 +26,14 @@ Chassis::Chassis(struct Core* core, Odom* odom) {
     this->odom_enabled = true;
     this->motor_gearset = AbstractMotor::gearset::blue;
     this->maximum_velocity = 600;
+}
+
+/**
+ * @brief Destroy the Chassis:: Chassis object
+ * 
+ */
+Chassis::~Chassis() {
+    this->moveVelocity(0);
 }
 
 /**
@@ -245,6 +256,11 @@ void Chassis::faceAngle(float angle) {
  * @param yPercent y coordinate of the target in percents
  */
 void Chassis::faceCoordinate(float xPercent, float yPercent) {
+    if (!this->odom_enabled) { // odometry not configured
+        printf("Cannot run faceAngle because odometry is not enabled\n");
+        return;
+    }
+
     RobotPosition position = this->odom->getState();
     float xDist = xPercent - position.x_pct;
     float yDist = yPercent - position.y_pct;

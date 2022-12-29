@@ -6,6 +6,7 @@ class Chassis {
     public:
         Chassis(struct Core* core);
         Chassis(struct Core* core, Odom* odom);
+        ~Chassis();
         void setBrakeMode(AbstractMotor::brakeMode brake_mode);
 
         // basic movement functions
