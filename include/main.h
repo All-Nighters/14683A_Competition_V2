@@ -97,6 +97,9 @@ struct Core {
 	// accessories
 	okapi::Motor*        intake;
 	okapi::Motor*        roller;
+	okapi::Motor*        catapult_motor;
+	pros::ADIDigitalOut* piston_booster_left;
+	pros::ADIDigitalOut* piston_booster_right;
 	pros::ADIDigitalOut* expansion;
 	// sensors
 	okapi::ADIEncoder*   left_tracking_wheel;
@@ -106,6 +109,8 @@ struct Core {
 	okapi::ADIEncoder*   middle_tracking_wheel;
 	pros::Imu*           imu_first;
 	pros::Imu*           imu_second;
+	pros::ADIDigitalIn*   catapult_load_sensor;
+	
 };
 void autonomous(void);
 void initialize(void);
