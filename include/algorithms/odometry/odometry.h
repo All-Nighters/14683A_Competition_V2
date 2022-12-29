@@ -7,13 +7,14 @@ typedef struct RobotPosition {
 } RobotPosition;
 
 enum class OdomMode {
-    MOTOR_IMU,          ///< motor encoder and IMU odometry 
-    MOTOR_FRONTTW_IMU,    ///< motor encoder, front tracking wheel, and IMU
-    LEFTTW_FRONTTW_IMU,   ///< left and front tracking wheels and IMU
-    RIGHTTW_FRONTTW_IMU,  ///< right and front tracking wheels and IMU
-    MOTOR_BACKTW_IMU,    ///< motor encoder, front tracking wheel, and IMU
-    LEFTTW_BACKTW_IMU,   ///< left and front tracking wheels and IMU
-    RIGHTTW_BACKTW_IMU,  ///< right and front tracking wheels and IMU
+    MOTOR_IMU,            ///< motor encoder and IMU odometry 
+    MOTOR_FRONTTW_IMU,    ///< motor encoder, front tracking wheel (horizontal), and IMU odometry 
+    LEFTTW_FRONTTW_IMU,   ///< left and front (horizontal) tracking wheels and IMU odometry 
+    RIGHTTW_FRONTTW_IMU,  ///< right and front (horizontal) tracking wheels and IMU odometry 
+    MOTOR_BACKTW_IMU,     ///< motor encoder, back tracking wheel (horizontal), and IMU odometry 
+    LEFTTW_BACKTW_IMU,    ///< left and back (horizontal) tracking wheels and IMU odometry 
+    RIGHTTW_BACKTW_IMU,   ///< right and back (horizontal) tracking wheels and IMU odometry 
+    MIDDLETW_IMU,         ///< middle tracking wheel (vertical) and IMU odometry 
 };
 
 class Odom {

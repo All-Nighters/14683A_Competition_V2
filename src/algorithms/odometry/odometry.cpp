@@ -82,6 +82,9 @@ void Odom::tare_sensors() {
              this->odometry_mode == OdomMode::RIGHTTW_BACKTW_IMU) {
         this->core->back_tracking_wheel->reset();    
     }
+    if (this->odometry_mode == OdomMode::MIDDLETW_IMU) {
+        this->core->middle_tracking_wheel->reset();    
+    }
 }
 
 /**
@@ -151,6 +154,10 @@ void Odom::position_tracking() {
     while(1) {
         // get position values
         switch (this->odometry_mode) {
+            case OdomMode::MIDDLETW_IMU:
+                this->LPos = this->core->middle_tracking_wheel->get();
+                this->RPos = this->core->middle_tracking_wheel->get();
+                break;
             case OdomMode::MOTOR_IMU:
                 this->LPos = (this->core->chassis_left_front->getPosition() +
                               this->core->chassis_left_middle->getPosition() +
@@ -274,6 +281,9 @@ void Odom::position_tracking() {
                      this->odometry_mode == OdomMode::RIGHTTW_BACKTW_IMU) {
                 this->deltaYLocal  = this->deltaDistR;
             }
+            else if (this->odometry_mode == OdomMode::MIDDLETW_IMU) {
+                this->deltaYLocal  = this->deltaDistR;
+            }
         }
         //Else, caluclate the new local position
         else {
@@ -286,11 +296,14 @@ void Odom::position_tracking() {
                 this->odometry_mode == OdomMode::LEFTTW_FRONTTW_IMU ||
                 this->odometry_mode == OdomMode::LEFTTW_BACKTW_IMU
             ) { // if left tracking wheel available
-                this->deltaYLocal  = 2 * sin(this->deltaTheta / 2.0) * ((this->deltaDistL / this->deltaTheta) + this->LTrackRadius);
+                this->deltaYLocal  = 2 * sin(this->deltaTheta / 2.0) * ((this->deltaDistL / this->deltaTheta) - this->LTrackRadius);
             } 
             else if (this->odometry_mode == OdomMode::RIGHTTW_FRONTTW_IMU ||
                      this->odometry_mode == OdomMode::RIGHTTW_BACKTW_IMU) {
-                this->deltaYLocal  = 2 * sin(this->deltaTheta / 2.0) * ((this->deltaDistR / this->deltaTheta) - this->LTrackRadius);
+                this->deltaYLocal  = 2 * sin(this->deltaTheta / 2.0) * ((this->deltaDistR / this->deltaTheta) + this->RTrackRadius);
+            }
+            else if (this->odometry_mode == OdomMode::MIDDLETW_IMU) {
+                this->deltaYLocal  = 2 * sin(this->deltaTheta / 2.0) * ((this->deltaDistR / this->deltaTheta));
             }
             
         }

@@ -103,6 +103,7 @@ struct Core {
 	okapi::ADIEncoder*   right_tracking_wheel;
 	okapi::ADIEncoder*   front_tracking_wheel;
 	okapi::ADIEncoder*   back_tracking_wheel;
+	okapi::ADIEncoder*   middle_tracking_wheel;
 	pros::Imu*           imu_first;
 	pros::Imu*           imu_second;
 };

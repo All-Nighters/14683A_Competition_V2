@@ -16,7 +16,7 @@ okapi::Motor        intake               = okapi::Motor(Configuration::Motors::I
 okapi::Motor        roller               = okapi::Motor(Configuration::Motors::ROLLER);
 pros::ADIDigitalOut expansion            = pros::ADIDigitalOut(Configuration::Analog::EXPANSION);
 // sensors
-okapi::ADIEncoder   left_tracking_wheel  = okapi::ADIEncoder(Configuration::Analog::ODOMETRY[0], Configuration::Analog::ODOMETRY[1], false);
+okapi::ADIEncoder   middle_tracking_wheel  = okapi::ADIEncoder(Configuration::Analog::ODOMETRY[0], Configuration::Analog::ODOMETRY[1], false);
 pros::Imu           imu_first            = pros::Imu(Configuration::Analog::IMU[0]);
 pros::Imu           imu_second           = pros::Imu(Configuration::Analog::IMU[1]);
 
@@ -41,7 +41,7 @@ void initialize() {
 	core.roller               = &roller;
 	core.expansion            = &expansion;
 	// sensors
-	core.left_tracking_wheel  = &left_tracking_wheel;
+	core.middle_tracking_wheel  = &middle_tracking_wheel;
 	core.imu_first            = &imu_first;
     core.imu_second           = &imu_second;
 }
