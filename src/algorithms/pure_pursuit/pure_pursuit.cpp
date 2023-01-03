@@ -227,11 +227,11 @@ ChassisVelocityPair PurePursuit::step(RobotPosition position, bool reverse) {
 
         // if reversing is enabled, reverse the control output
         if (reverse) {
-            velocity_pair.left_v = clamp(-(forward + rotation), -this->max_velocity, this->max_velocity);
-            velocity_pair.right_v = clamp(-(forward - rotation), -this->max_velocity, this->max_velocity);
+            velocity_pair.left_v = Math::clamp(-(forward + rotation), -this->max_velocity, this->max_velocity);
+            velocity_pair.right_v = Math::clamp(-(forward - rotation), -this->max_velocity, this->max_velocity);
         } else {
-            velocity_pair.left_v = clamp(forward + rotation, -this->max_velocity, this->max_velocity);
-            velocity_pair.right_v = clamp(forward - rotation, -this->max_velocity, this->max_velocity);
+            velocity_pair.left_v = Math::clamp(forward + rotation, -this->max_velocity, this->max_velocity);
+            velocity_pair.right_v = Math::clamp(forward - rotation, -this->max_velocity, this->max_velocity);
         }
         
     } else {

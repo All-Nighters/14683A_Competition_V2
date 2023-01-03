@@ -20,6 +20,7 @@ Catapult::Catapult(struct Core* core) {
 Catapult::~Catapult() {
     shooting_task->remove();
     shooting_task.reset(nullptr);
+    this->core->catapult_motor->moveVoltage(0);
 }
 
 

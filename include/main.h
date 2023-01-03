@@ -49,7 +49,6 @@
 
 // utilities
 #include "utilities/coordinates.h"
-#include "utilities/math_funcs.h"
 #include "utilities/math.h"
 
 // algorithms

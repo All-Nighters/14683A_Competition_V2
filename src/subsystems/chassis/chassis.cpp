@@ -192,7 +192,7 @@ void Chassis::turnAngle(float angle) {
         float error = target_angle - current_rotation;
         float deriv_error = error - prev_error;
 
-        float control_output = clamp(error * this->Rp + deriv_error * this->Rd, -12000, 12000);
+        float control_output = Math::clamp(error * this->Rp + deriv_error * this->Rd, -12000, 12000);
 
         if (abs(control_output) < 2000) {
             control_output = control_output > 0 ? 2000 : -2000;
@@ -222,17 +222,17 @@ void Chassis::faceAngle(float angle) {
     }
     RobotPosition robot_state = this->odom->getState();
     float target_angle = angle;
-    float prev_error = formatAngle(target_angle) - formatAngle(robot_state.theta);
+    float prev_error = Math::format_angle(target_angle) - Math::format_angle(robot_state.theta);
     float start_time = pros::millis();  
     float timeout = 10; // maximum runtime in seconds
 
-    while (abs(formatAngle(target_angle) - formatAngle(robot_state.theta)) >= 0.5 && pros::millis() - start_time <= timeout*1000) {
+    while (abs(Math::format_angle(target_angle) - Math::format_angle(robot_state.theta)) >= 0.5 && pros::millis() - start_time <= timeout*1000) {
         robot_state = this->odom->getState();
 
-        float error = formatAngle(target_angle) - formatAngle(robot_state.theta);
+        float error = Math::format_angle(target_angle) - Math::format_angle(robot_state.theta);
         float deriv_error = error - prev_error;
 
-        float control_output = clamp(error * this->Rp + deriv_error * this->Rd, -12000, 12000);
+        float control_output = Math::clamp(error * this->Rp + deriv_error * this->Rd, -12000, 12000);
 
         if (abs(control_output) < 2000) {
             control_output = control_output > 0 ? 2000 : -2000;
@@ -296,7 +296,7 @@ void Chassis::faceCoordinate(float xPercent, float yPercent) {
 
     float faceAngle;
 
-    faceAngle = formatAngle(relativeAngle - position.theta);
+    faceAngle = Math::format_angle(relativeAngle - position.theta);
 
     turnAngle(faceAngle);
 }
@@ -365,7 +365,7 @@ float Chassis::skim(float v) {
 }
 
 float Chassis::exponential_filter(float input) {
-    return clamp((1.2*pow(1.045315, 100*input) - 1.2 + 0.3*input) / 100, 0, 1);
+    return Math::clamp((1.2*pow(1.045315, 100*input) - 1.2 + 0.3*input) / 100, 0, 1);
 }
 /**
  * @brief Cheezy driver control
@@ -399,8 +399,8 @@ void Chassis::cheezyDrive(float throttle, float turn) {
         float left = t_left + skim(t_right);
         float right = t_right + skim(t_left);
         this->moveVelocity(
-            clamp(left * this->maximum_velocity, -this->maximum_velocity, this->maximum_velocity), 
-            clamp(right * this->maximum_velocity, -this->maximum_velocity, this->maximum_velocity)
+            Math::clamp(left * this->maximum_velocity, -this->maximum_velocity, this->maximum_velocity), 
+            Math::clamp(right * this->maximum_velocity, -this->maximum_velocity, this->maximum_velocity)
         );
     }
 }
