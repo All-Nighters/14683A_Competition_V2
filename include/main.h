@@ -102,6 +102,7 @@ struct Core {
 	pros::ADIDigitalOut* piston_booster_left;
 	pros::ADIDigitalOut* piston_booster_right;
 	pros::ADIDigitalOut* expansion;
+	pros::ADIDigitalOut* blocker;
 	// sensors
 	okapi::ADIEncoder*   left_tracking_wheel;
 	okapi::ADIEncoder*   right_tracking_wheel;
