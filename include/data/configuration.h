@@ -27,6 +27,7 @@ namespace Configuration {
         inline std::uint8_t     CATAPULT_LOAD_SENSOR = 'C';
         inline std::uint8_t     VISION_GOAL          = 1;
         inline std::uint8_t     VISION_INTAKE          = 9;
+        inline std::uint8_t     OPTICAL_ROLLER       = 2;
     }
 
     namespace Controls {

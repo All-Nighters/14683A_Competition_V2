@@ -66,6 +66,7 @@ typedef struct ChassisVelocityPair {
 #include "subsystems/intake/intake.h"
 #include "subsystems/roller/roller.h"
 #include "subsystems/vision/vision.h"
+#include "subsystems/optical/optical.h"
 #include "subsystems/catapult/catapult.h"
 #include "subsystems/expansion/expansion.h"
 #include "subsystems/blocker/blocker.h"
@@ -120,6 +121,7 @@ struct Core {
 	pros::ADIDigitalIn*  catapult_load_sensor;
 	pros::Vision*        vision_goal;
 	pros::Vision*        vision_intake;
+	pros::Optical*       optical_roller;
 	
 };
 
