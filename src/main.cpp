@@ -24,6 +24,7 @@ pros::Imu           imu_first             = pros::Imu(Configuration::Analog::IMU
 pros::Imu           imu_second            = pros::Imu(Configuration::Analog::IMU[1]);
 pros::ADIDigitalIn  catapult_load_sensor  = pros::ADIDigitalIn(Configuration::Digital::CATAPULT_LOAD_SENSOR);
 pros::Vision        vision_goal           = pros::Vision(Configuration::Digital::VISION_GOAL);
+pros::Vision        vision_intake         = pros::Vision(Configuration::Digital::VISION_INTAKE);
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -52,6 +53,7 @@ void initialize() {
     core.imu_second           = &imu_second;
 	core.catapult_load_sensor = &catapult_load_sensor;
 	core.vision_goal          = &vision_goal;
+	core.vision_intake        = &vision_intake;
 }
 
 /**

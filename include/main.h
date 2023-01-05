@@ -34,6 +34,11 @@
  */
 #define PROS_USE_LITERALS
 
+typedef struct ChassisVelocityPair {
+    float left_v;
+    float right_v;
+} ChassisVelocityPair;
+
 #include "api.h"
 
 /**
@@ -54,6 +59,7 @@
 // algorithms
 #include "algorithms/odometry/odometry.h"
 #include "algorithms/motion_profile/motion_profile.h"
+#include "algorithms/disk_pursuit/disk_pursuit.h"
 
 // subsystems
 #include "subsystems/chassis/chassis.h"
@@ -113,8 +119,10 @@ struct Core {
 	pros::Imu*           imu_second;
 	pros::ADIDigitalIn*  catapult_load_sensor;
 	pros::Vision*        vision_goal;
+	pros::Vision*        vision_intake;
 	
 };
+
 void autonomous(void);
 void initialize(void);
 void disabled(void);

@@ -1,10 +1,5 @@
 #pragma once
 
-typedef struct ChassisVelocityPair {
-    float left_v;
-    float right_v;
-} ChassisVelocityPair;
-
 class PurePursuit {
     public:
         PurePursuit(float max_velocity = 300);
