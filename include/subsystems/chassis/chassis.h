@@ -38,7 +38,7 @@ class Chassis {
         const float Td = 0;
 
         // rotational PID constants
-        const float Rp = 1;
+        const float Rp = 150;
         const float Ri = 0;
         const float Rd = 0;
 
