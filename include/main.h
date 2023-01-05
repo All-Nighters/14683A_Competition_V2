@@ -111,7 +111,8 @@ struct Core {
 	okapi::ADIEncoder*   middle_tracking_wheel;
 	pros::Imu*           imu_first;
 	pros::Imu*           imu_second;
-	pros::ADIDigitalIn*   catapult_load_sensor;
+	pros::ADIDigitalIn*  catapult_load_sensor;
+	pros::Vision*        vision_goal;
 	
 };
 void autonomous(void);
