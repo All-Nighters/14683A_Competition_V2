@@ -1,26 +1,29 @@
+#include <vector>
 #include "main.h"
+
 
 struct Core core;
 
 // controller
-okapi::Controller   controller           = okapi::Controller();
+okapi::Controller   controller            = okapi::Controller();
 // chassis
-okapi::Motor        chassis_left_front   = okapi::Motor(Configuration::Motors::CHASSIS_LEFT_FRONT);
-okapi::Motor        chassis_left_middle  = okapi::Motor(Configuration::Motors::CHASSIS_LEFT_MIDDLE);
-okapi::Motor        chassis_left_back    = okapi::Motor(Configuration::Motors::CHASSIS_LEFT_BACK);
-okapi::Motor        chassis_right_front  = okapi::Motor(Configuration::Motors::CHASSIS_RIGHT_FRONT);
-okapi::Motor        chassis_right_middle = okapi::Motor(Configuration::Motors::CHASSIS_RIGHT_MIDDLE);
-okapi::Motor        chassis_right_back   = okapi::Motor(Configuration::Motors::CHASSIS_RIGHT_BACK);
+okapi::Motor        chassis_left_front    = okapi::Motor(Configuration::Motors::CHASSIS_LEFT_FRONT);
+okapi::Motor        chassis_left_middle   = okapi::Motor(Configuration::Motors::CHASSIS_LEFT_MIDDLE);
+okapi::Motor        chassis_left_back     = okapi::Motor(Configuration::Motors::CHASSIS_LEFT_BACK);
+okapi::Motor        chassis_right_front   = okapi::Motor(Configuration::Motors::CHASSIS_RIGHT_FRONT);
+okapi::Motor        chassis_right_middle  = okapi::Motor(Configuration::Motors::CHASSIS_RIGHT_MIDDLE);
+okapi::Motor        chassis_right_back    = okapi::Motor(Configuration::Motors::CHASSIS_RIGHT_BACK);
 // accessories
-okapi::Motor        intake               = okapi::Motor(Configuration::Motors::INTAKE);
-okapi::Motor        roller               = okapi::Motor(Configuration::Motors::ROLLER);
-okapi::Motor        catapult             = okapi::Motor(Configuration::Motors::CATAPULT);
-pros::ADIDigitalOut expansion            = pros::ADIDigitalOut(Configuration::Analog::EXPANSION);
+okapi::Motor        intake                = okapi::Motor(Configuration::Motors::INTAKE);
+okapi::Motor        roller                = okapi::Motor(Configuration::Motors::ROLLER);
+okapi::Motor        catapult              = okapi::Motor(Configuration::Motors::CATAPULT);
+pros::ADIDigitalOut expansion             = pros::ADIDigitalOut(Configuration::Analog::EXPANSION);
 // sensors
-okapi::ADIEncoder   middle_tracking_wheel= okapi::ADIEncoder(Configuration::Analog::ODOMETRY[0], Configuration::Analog::ODOMETRY[1], false);
-pros::Imu           imu_first            = pros::Imu(Configuration::Analog::IMU[0]);
-pros::Imu           imu_second           = pros::Imu(Configuration::Analog::IMU[1]);
-pros::ADIDigitalIn catapult_load_sensor  = pros::ADIDigitalIn(Configuration::Digital::CATAPULT_LOAD_SENSOR);
+okapi::ADIEncoder   middle_tracking_wheel = okapi::ADIEncoder(Configuration::Analog::ODOMETRY[0], Configuration::Analog::ODOMETRY[1], false);
+pros::Imu           imu_first             = pros::Imu(Configuration::Analog::IMU[0]);
+pros::Imu           imu_second            = pros::Imu(Configuration::Analog::IMU[1]);
+pros::ADIDigitalIn  catapult_load_sensor  = pros::ADIDigitalIn(Configuration::Digital::CATAPULT_LOAD_SENSOR);
+pros::Vision        vision_goal           = pros::Vision(Configuration::Digital::VISION_GOAL);
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -48,6 +51,7 @@ void initialize() {
 	core.imu_first            = &imu_first;
     core.imu_second           = &imu_second;
 	core.catapult_load_sensor = &catapult_load_sensor;
+	core.vision_goal          = &vision_goal;
 }
 
 /**

@@ -24,12 +24,13 @@ namespace Configuration {
     };
 
     namespace Digital {
-        inline std::uint8_t    CATAPULT_LOAD_SENSOR   = 'C';
+        inline std::uint8_t     CATAPULT_LOAD_SENSOR = 'C';
+        inline std::uint8_t     VISION_GOAL          = 1;
     }
 
     namespace Controls {
-        inline ControllerAnalog FORWARD_AXIS       = ControllerAnalog::leftY;
-        inline ControllerAnalog TURN_AXIS          = ControllerAnalog::rightX;
+        inline ControllerAnalog  FORWARD_AXIS      = ControllerAnalog::leftY;
+        inline ControllerAnalog  TURN_AXIS         = ControllerAnalog::rightX;
 
         inline ControllerDigital INTAKE_BUTTON     = ControllerDigital::R1;
         inline ControllerDigital INTAKE_BUTTON_REV = ControllerDigital::A;
