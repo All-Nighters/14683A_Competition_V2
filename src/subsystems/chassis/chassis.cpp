@@ -11,6 +11,8 @@ Chassis::Chassis(struct Core* core) {
     this->odom_enabled = false;
     this->motor_gearset = AbstractMotor::gearset::blue;
     this->maximum_velocity = 600;
+    this->imu1 = core->imu_first;
+    this->imu2 = core->imu_second;
 }
 
 /**
@@ -26,6 +28,8 @@ Chassis::Chassis(struct Core* core, Odom* odom) {
     this->odom_enabled = true;
     this->motor_gearset = AbstractMotor::gearset::blue;
     this->maximum_velocity = 600;
+    this->imu1 = core->imu_first;
+    this->imu2 = core->imu_second;
 }
 
 /**
@@ -100,12 +104,12 @@ void Chassis::moveVelocity(float left_vel, float right_vel) {
  * @param voltage 
  */
 void Chassis::moveVoltage(float voltage) {
-    this->core->chassis_left_front  ->moveVelocity(voltage);
-    this->core->chassis_left_middle ->moveVelocity(voltage);
-    this->core->chassis_left_back   ->moveVelocity(voltage);
-    this->core->chassis_right_front ->moveVelocity(voltage);
-    this->core->chassis_right_middle->moveVelocity(voltage);
-    this->core->chassis_right_back  ->moveVelocity(voltage);
+    this->core->chassis_left_front  ->moveVoltage(voltage);
+    this->core->chassis_left_middle ->moveVoltage(voltage);
+    this->core->chassis_left_back   ->moveVoltage(voltage);
+    this->core->chassis_right_front ->moveVoltage(voltage);
+    this->core->chassis_right_middle->moveVoltage(voltage);
+    this->core->chassis_right_back  ->moveVoltage(voltage);
 }
 
 
@@ -116,12 +120,12 @@ void Chassis::moveVoltage(float voltage) {
  * @param right_volt right voltage
  */
 void Chassis::moveVoltage(float left_volt, float right_volt) {
-    this->core->chassis_left_front  ->moveVelocity(left_volt);
-    this->core->chassis_left_middle ->moveVelocity(left_volt);
-    this->core->chassis_left_back   ->moveVelocity(left_volt);
-    this->core->chassis_right_front ->moveVelocity(right_volt);
-    this->core->chassis_right_middle->moveVelocity(right_volt);
-    this->core->chassis_right_back  ->moveVelocity(right_volt);
+    this->core->chassis_left_front  ->moveVoltage(left_volt);
+    this->core->chassis_left_middle ->moveVoltage(left_volt);
+    this->core->chassis_left_back   ->moveVoltage(left_volt);
+    this->core->chassis_right_front ->moveVoltage(right_volt);
+    this->core->chassis_right_middle->moveVoltage(right_volt);
+    this->core->chassis_right_back  ->moveVoltage(right_volt);
 }
 
 /**
@@ -182,7 +186,7 @@ void Chassis::moveDistance(float pct, float max_voltage) {
  * @param angle angle in degrees
  */
 void Chassis::turnAngle(float angle) {
-    float current_rotation = (this->imu1->get_rotation() + this->imu2->get_rotation()) / 2;
+    float current_rotation = (this->imu1->get_rotation() + this->imu2->get_rotation())/2.0;
     float target_angle = current_rotation + angle;
     float prev_error = abs(angle);
     float start_time = pros::millis();  
@@ -194,6 +198,7 @@ void Chassis::turnAngle(float angle) {
 
         float control_output = Math::clamp(error * this->Rp + deriv_error * this->Rd, -12000, 12000);
 
+        printf("%f %f\n", current_rotation, control_output);
         if (abs(control_output) < 2000) {
             control_output = control_output > 0 ? 2000 : -2000;
         }
@@ -202,7 +207,7 @@ void Chassis::turnAngle(float angle) {
 
         this->moveVoltage(control_output, -control_output);
         pros::delay(20);
-        current_rotation = (this->imu1->get_rotation() + this->imu2->get_rotation()) / 2;
+        current_rotation = (this->imu1->get_rotation() + this->imu2->get_rotation())/2.0;
     }
 
     this->moveVoltage(0);
@@ -388,19 +393,18 @@ void Chassis::cheezyDrive(float throttle, float turn) {
         turn = -this->exponential_filter(-turn);
     }
 
-    // input threashold
-    if (throttle < 0.1 && turn < 0.1) {
-        this->moveVelocity(0);
-    }
-    else {
-        float t_left = throttle + turn;
-        float t_right = throttle - turn;
+    float t_left = throttle + turn;
+    float t_right = throttle - turn;
 
-        float left = t_left + skim(t_right);
-        float right = t_right + skim(t_left);
+    float left = t_left + skim(t_right);
+    float right = t_right + skim(t_left);
+
+    if (abs(left) < 0.01 && abs(right) < 0.01) {
+        this->moveVelocity(0);
+    } else {
         this->moveVelocity(
             Math::clamp(left * this->maximum_velocity, -this->maximum_velocity, this->maximum_velocity), 
             Math::clamp(right * this->maximum_velocity, -this->maximum_velocity, this->maximum_velocity)
         );
-    }
+    } 
 }
