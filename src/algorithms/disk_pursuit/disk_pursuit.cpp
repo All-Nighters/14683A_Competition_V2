@@ -31,10 +31,11 @@ float DiskPursuit::get_disk_distance(pros::vision_object_s_t object) {
     int center_y = object.top_coord + (object.width / 2) - (VISION_FOV_HEIGHT / 2);
     int center_x = object.left_coord + (object.width / 2) - (VISION_FOV_WIDTH / 2);
     float center_y_percentage = center_y / (VISION_FOV_WIDTH / 2.0f);
+    float center_x_percentage = center_x / (VISION_FOV_WIDTH / 2.0f);
     float direction_radian = std::atan(center_y_percentage * std::tan(Math::degree_to_radian(this->max_vertical_angle / 2.0f)));
     float theta_diff = Math::degree_to_radian(this->max_vertical_angle) / 2.0 + direction_radian;
     float distance = this->sensor_height / std::tan(theta_diff + this->theta_initial);
-    return sqrt(pow(distance, 2) + pow(center_x, 2));
+    return sqrt(pow(distance, 2) + pow(center_x_percentage * distance * std::tan(this->max_horizontal_angle / 2.0), 2));
 }
 
 /**
