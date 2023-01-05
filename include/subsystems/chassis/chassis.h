@@ -33,7 +33,7 @@ class Chassis {
         void cheezyDrive(float throttle, float turn);
     private:
         // translational PID constants
-        const float Tp = 1;
+        const float Tp = 5;
         const float Ti = 0;
         const float Td = 0;
 

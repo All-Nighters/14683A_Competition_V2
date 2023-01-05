@@ -143,37 +143,38 @@ void Chassis::moveDistance(float pct, float max_voltage) {
     int direction            = revs < 0 ? -1 : 1;
     float timeout            = 10; // maximum runtime in seconds
     
-    float prevErrorPosition  = abs(targetAngle - this->getLeftPosition());
-    float prevFaceAngleError = 0;
+    float prev_error_position  = abs(targetAngle - this->getLeftPosition());
+    float prev_face_angle_error = 0;
+    float total_error_position = 0;
+    float total_error_facing = 0;
+
 
     while (abs(targetAngle - this->getLeftPosition()) >= 10 && 
     pros::millis() - start_time <= timeout*1000) {
 
         float error_position = abs(targetAngle - this->getLeftPosition());
+        total_error_position += error_position;
 
-        prevErrorPosition = abs(targetAngle - this->getLeftPosition());
-        float error_Facing = targetFaceAngle- ((this->imu1->get_rotation() + this->imu2->get_rotation()) / 2);
+        prev_error_position = abs(targetAngle - this->getLeftPosition());
+        float error_facing = targetFaceAngle - ((this->imu1->get_rotation() + this->imu2->get_rotation()) / 2);
+        total_error_facing += error_facing;
+
+        float deriv_position = error_position - prev_error_position;
+        float deriv_facing = error_facing - prev_face_angle_error;
 
 
-        float deriv_position = error_position - prevErrorPosition;
-        float deriv_Facing = error_Facing - prevFaceAngleError;
+        float control_output = error_position * this->Tp + total_error_position * this->Ti + deriv_position * this->Td;
+        float control_output_facing = error_facing * this->Dp + total_error_facing * this->Di + deriv_facing * this->Dd;
 
-
-        float control_output = error_position * this->Tp + deriv_position * this->Td;
-        float control_output_Facing = error_Facing * this->Dp + deriv_Facing * this->Dd;
-
-        float control_output_Left = direction * std::fmax(std::fmin(control_output, max_voltage), -max_voltage) + std::fmax(std::fmin(control_output_Facing, max_voltage * 0.25), -max_voltage * 0.25);
-        float control_output_Right = direction * std::fmax(std::fmin(control_output, max_voltage), -max_voltage) - std::fmax(std::fmin(control_output_Facing, max_voltage * 0.25), -max_voltage * 0.25);
-
-        if (abs(control_output_Left) < 2000 && direction < 0) {
-            control_output_Left = -2000;
-            control_output_Right = -2000;
+        float control_output_Left = direction * std::fmax(std::fmin(control_output, max_voltage), -max_voltage) + std::fmax(std::fmin(control_output_facing, max_voltage * 0.25), -max_voltage * 0.25);
+        float control_output_Right = direction * std::fmax(std::fmin(control_output, max_voltage), -max_voltage) - std::fmax(std::fmin(control_output_facing, max_voltage * 0.25), -max_voltage * 0.25);
+        if (abs(control_output_Left) < 2000) {
+            control_output_Left = direction * 2000;
         }
-        else if (abs(control_output_Left) < 2000 && direction > 0) {
-            control_output_Left = 2000;
-            control_output_Right = 2000;
+        else if (abs(control_output_Right) < 2000) {
+            control_output_Right = direction * 2000;
         }
-        prevErrorPosition = error_position;
+        prev_error_position = error_position;
         this->moveVoltage(control_output_Left, control_output_Right);
         pros::delay(20);
     }
@@ -189,16 +190,17 @@ void Chassis::turnAngle(float angle) {
     float current_rotation = (this->imu1->get_rotation() + this->imu2->get_rotation())/2.0;
     float target_angle = current_rotation + angle;
     float prev_error = abs(angle);
+    float total_error = 0;
     float start_time = pros::millis();  
     float timeout = 10; // maximum runtime in seconds
 
     while (abs(target_angle - current_rotation) >= 1 && pros::millis() - start_time <= timeout*1000) {
         float error = target_angle - current_rotation;
+        total_error += error;
         float deriv_error = error - prev_error;
 
-        float control_output = Math::clamp(error * this->Rp + deriv_error * this->Rd, -12000, 12000);
+        float control_output = Math::clamp(error * this->Rp + total_error * this->Ri + deriv_error * this->Rd, -12000, 12000);
 
-        printf("%f %f\n", current_rotation, control_output);
         if (abs(control_output) < 2000) {
             control_output = control_output > 0 ? 2000 : -2000;
         }
