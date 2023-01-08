@@ -85,6 +85,9 @@ void Odom::tare_sensors() {
     if (this->odometry_mode == OdomMode::MIDDLETW_IMU) {
         this->core->middle_tracking_wheel->reset();    
     }
+
+    this->core->imu_first->tare();
+    this->core->imu_second->tare();
 }
 
 /**

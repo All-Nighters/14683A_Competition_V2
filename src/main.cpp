@@ -56,6 +56,9 @@ void initialize() {
 	core.vision_goal          = &vision_goal;
 	core.vision_intake        = &vision_intake;
 	core.optical_roller       = &optical_roller;
+
+	core.imu_first->reset(true);
+	core.imu_second->reset(true);
 }
 
 /**
