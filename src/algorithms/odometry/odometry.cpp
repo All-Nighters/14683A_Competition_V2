@@ -3,6 +3,7 @@
 
 Odom::Odom(struct Core* core, OdomMode mode) { 
     // Note: make sure all sensors required by the odometry mode are plugged in
+    this->core = core;
     this->odometry_mode = mode;
     this->WHEEL_RADIUS = Constants::Robot::WHEEL_DIAMETER.convert(meter) / 2;
     this->LTrackRadius = Constants::Robot::TRACK_LENGTH.convert(meter) / 2;
@@ -10,7 +11,7 @@ Odom::Odom(struct Core* core, OdomMode mode) {
     this->STrackRadius = Constants::Robot::MIDDLE_ENCODER_DISTANCE.convert(meter) / 2;
 
     this->reset_variables();
-    this->tare_sensors();
+    // this->tare_sensors();
     
     odom_task = std::move(std::make_unique<pros::Task>(this->start_odom, this, "Odom"));
 }
@@ -58,14 +59,15 @@ void Odom::reset_variables() {
     this->yPosGlobal = Y_START;
 }
 
-void Odom::tare_sensors() {
+void Odom::tare_sensors() {   
     this->core->chassis_left_front   ->tarePosition();
     this->core->chassis_left_middle  ->tarePosition();
     this->core->chassis_left_back    ->tarePosition();
     this->core->chassis_right_front  ->tarePosition();
     this->core->chassis_right_middle ->tarePosition();
     this->core->chassis_right_back   ->tarePosition();
-    
+
+
     if (this->odometry_mode == OdomMode::LEFTTW_FRONTTW_IMU ||
         this->odometry_mode == OdomMode::LEFTTW_BACKTW_IMU) {
         this->core->left_tracking_wheel->reset();    
@@ -160,6 +162,9 @@ void Odom::position_tracking() {
             case OdomMode::MIDDLETW_IMU:
                 this->LPos = this->core->middle_tracking_wheel->get();
                 this->RPos = this->core->middle_tracking_wheel->get();
+                if (DEBUG) {
+                    printf("Encoder: L=%f, R=%f Rot=%f\n", this->LPos, this->RPos, (this->core->imu_first->get_rotation() + this->core->imu_second->get_rotation()) / 2);
+                }
                 break;
             case OdomMode::MOTOR_IMU:
                 this->LPos = (this->core->chassis_left_front->getPosition() +

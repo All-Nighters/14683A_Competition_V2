@@ -95,6 +95,7 @@ void Catapult::shooting_loop() {
             this->reposition();
             this->triggered = false;
         }
+        this->reposition();
         pros::delay(20);
     }
 }

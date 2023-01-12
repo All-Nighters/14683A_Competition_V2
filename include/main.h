@@ -72,6 +72,11 @@ typedef struct ChassisVelocityPair {
 #include "subsystems/blocker/blocker.h"
 #include "../src/subsystems/graphical_interface/graphical_interface.h"
 
+// autons
+#include "autonomous/auton_first_scoring.h"
+#include "autonomous/auton_first_support.h"
+#include "autonomous/auton_second_scoring.h"
+
 /**
  * If you find doing pros::Motor() to be tedious and you'd prefer just to do
  * Motor, you can use the namespace with the following commented out line.

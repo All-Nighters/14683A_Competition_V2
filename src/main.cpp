@@ -90,7 +90,43 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+	Chassis chassis = Chassis(&core);
+	Catapult cata = Catapult(&core);
+
+	GraphicalInterface::InterfaceSelector position = GraphicalInterface::get_selector(GraphicalInterface::InterfaceConfiguration::GAME_POSITION);
+	GraphicalInterface::InterfaceSelector game_team = GraphicalInterface::get_selector(GraphicalInterface::InterfaceConfiguration::GAME_TEAM);
+	GraphicalInterface::InterfaceSelector mode = GraphicalInterface::get_selector(GraphicalInterface::InterfaceConfiguration::GAME_MODE);
+	GraphicalInterface::InterfaceSelector game_round = GraphicalInterface::get_selector(GraphicalInterface::InterfaceConfiguration::GAME_ROUND);
+	
+	if (game_round == GraphicalInterface::InterfaceSelector::SELECTOR_ROUND_SKILL) {
+
+		return;
+	}
+
+	// team
+	bool position_offset = game_team == GraphicalInterface::InterfaceSelector::SELECTOR_TEAM_RED;
+	
+	// fist position scoring mode
+	if      (position == GraphicalInterface::InterfaceSelector::SELECTOR_POSITION_1 &&
+		     mode == GraphicalInterface::InterfaceSelector::SELECTOR_MODE_SCORE) {
+		AutonFirstScoring auton = AutonFirstScoring(&chassis, &cata);
+	}
+	// second position scoring mode
+	else if (position == GraphicalInterface::InterfaceSelector::SELECTOR_POSITION_2 &&
+		     mode == GraphicalInterface::InterfaceSelector::SELECTOR_MODE_SCORE) {
+
+	}
+	// fist position support mode (WP)
+	else if (position == GraphicalInterface::InterfaceSelector::SELECTOR_POSITION_1 &&
+		     mode == GraphicalInterface::InterfaceSelector::SELECTOR_MODE_SUPPORT) {
+
+	}
+	// idle mode
+	else if (mode == GraphicalInterface::InterfaceSelector::SELECTOR_MODE_IDLE) {
+		;
+	}
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -106,11 +142,12 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-    // Odom odometry = Odom(&core, OdomMode::MIDDLETW_IMU);
+    Odom odometry = Odom(&core, OdomMode::MIDDLETW_IMU);
     Chassis chassis = Chassis(&core);
 	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
 	// Catapult cata = Catapult(&core);
 	while (true) {
+		// printf("%f\n", core.middle_tracking_wheel->get());
 		chassis.cheezyDrive(core.controller->getAnalog(okapi::ControllerAnalog::leftY), core.controller->getAnalog(okapi::ControllerAnalog::rightX));
 		// if (core.controller->getDigital(Configuration::Controls::SHOOT_BUTTON)) {
 		// 	cata.fire();
