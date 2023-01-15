@@ -8,6 +8,7 @@
 Chassis::Chassis(struct Core* core) {
     this->core = core;
     this->pure_pursuit = PurePursuit();
+    this->disk_pursuit = std::make_unique<DiskPursuit>(core);
     this->odom_enabled = false;
     this->motor_gearset = AbstractMotor::gearset::blue;
     this->maximum_velocity = 600;
@@ -24,6 +25,7 @@ Chassis::Chassis(struct Core* core) {
 Chassis::Chassis(struct Core* core, Odom* odom) {
     this->core = core;
     this->pure_pursuit = PurePursuit();
+    this->disk_pursuit = std::make_unique<DiskPursuit>(core);
     this->odom = odom;
     this->odom_enabled = true;
     this->motor_gearset = AbstractMotor::gearset::blue;
@@ -341,6 +343,49 @@ void Chassis::simpleMoveToPointBackwards(float xPercent, float yPercent) {
     
 
 }
+
+/**
+ * @brief Follow a path
+ * 
+ * @param path path
+ * @param reverse whether the robot should move backwards to pursue the path
+ * @param enable_disk_pursuit whether the robot should pursue nearby disks
+ */
+void Chassis::followPath(std::vector<Coordinates> path, bool reverse, bool enable_disk_pursuit) {
+    float pursuit_threash = Constants::DiskPursuit::PURSUE_RADIUS; // distance threashold to pursue disk
+    float giveup_threash = Constants::DiskPursuit::GIVEUP_RADIUS; // distance threashold to giveup disk
+    bool is_pursuing_disk = false;
+    this->pure_pursuit.set_path(path);
+
+    while (!this->pure_pursuit.is_arrived()) {
+        RobotPosition position = this->odom->getState();
+        ChassisVelocityPair velocity_pair;
+        pros::vision_object_s_t closest_disk = disk_pursuit->get_closest_disk();
+        if (enable_disk_pursuit) {
+            if (is_pursuing_disk) {
+                if (this->disk_pursuit->get_disk_distance(closest_disk) < giveup_threash) {
+                    velocity_pair = this->disk_pursuit->step();
+                } else {
+                    is_pursuing_disk = false;
+                    velocity_pair = this->pure_pursuit.step(position, reverse);
+                }
+            } else {
+                if (this->disk_pursuit->get_disk_distance(closest_disk) < pursuit_threash) {
+                    is_pursuing_disk = true;
+                    velocity_pair = this->disk_pursuit->step();
+                } else {
+                    velocity_pair = this->pure_pursuit.step(position, reverse);
+                }
+            }
+        } else {
+            velocity_pair = this->pure_pursuit.step(position, reverse);
+        }
+        this->moveVelocity(velocity_pair.left_v, velocity_pair.right_v);
+        pros::delay(10);
+    }
+    this->moveVelocity(0);
+}
+
 /**
  * @brief Get left track motor position reading
  * 

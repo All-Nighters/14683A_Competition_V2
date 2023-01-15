@@ -21,6 +21,9 @@ void DiskPursuit::set_signature(pros::vision_signature_s_t* signature) {
     this->core->vision_intake->set_signature(1, signature);
 }
 
+pros::vision_object_s_t DiskPursuit::get_closest_disk() {
+    return this->core->vision_goal->get_by_size(0);
+}
 /**
  * @brief Get disk distance to the robot
  * 
@@ -58,7 +61,7 @@ float DiskPursuit::get_disk_direction(pros::vision_object_s_t object) {
  */
 ChassisVelocityPair DiskPursuit::step() {
     ChassisVelocityPair velocity_pair;
-    pros::vision_object_s_t object = this->core->vision_intake->get_by_size(0);
+    pros::vision_object_s_t object = this->get_closest_disk();
     if (object.signature == 255) return velocity_pair;
     
     float error = this->get_disk_direction(object);

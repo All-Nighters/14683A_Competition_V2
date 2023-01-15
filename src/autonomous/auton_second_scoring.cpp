@@ -9,3 +9,7 @@ AutonSecondScoring::AutonSecondScoring(Chassis* chassis, Catapult* catapul, bool
 AutonSecondScoring::~AutonSecondScoring() {
     this->chassis->moveVelocity(0);
 }
+
+void AutonSecondScoring::run() {
+    
+}

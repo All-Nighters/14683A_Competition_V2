@@ -23,6 +23,8 @@ class Chassis {
         void simpleMoveToPoint(float x, float y);
         void simpleMoveToPointBackwards(float x, float y);
 
+        void followPath(std::vector<Coordinates> path, bool reverse = false, bool enable_disk_pursuit = false);
+
         // position sensing functions
         float getLeftPosition();
         float getRightPosition();
@@ -50,6 +52,7 @@ class Chassis {
         struct Core* core;
         Odom* odom;
         PurePursuit pure_pursuit;
+        std::unique_ptr<DiskPursuit> disk_pursuit;
         bool odom_enabled;
         AbstractMotor::gearset motor_gearset;
         float maximum_velocity;

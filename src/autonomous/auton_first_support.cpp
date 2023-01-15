@@ -9,3 +9,7 @@ AutonFirstSupport::AutonFirstSupport(Chassis* chassis, Catapult* catapul, bool o
 AutonFirstSupport::~AutonFirstSupport() {
     this->chassis->moveVelocity(0);
 }
+
+void AutonFirstSupport::run() {
+    
+}

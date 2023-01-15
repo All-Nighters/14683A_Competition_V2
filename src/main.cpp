@@ -111,16 +111,19 @@ void autonomous() {
 	if      (position == GraphicalInterface::InterfaceSelector::SELECTOR_POSITION_1 &&
 		     mode == GraphicalInterface::InterfaceSelector::SELECTOR_MODE_SCORE) {
 		AutonFirstScoring auton = AutonFirstScoring(&chassis, &cata);
+		auton.run();
 	}
 	// second position scoring mode
 	else if (position == GraphicalInterface::InterfaceSelector::SELECTOR_POSITION_2 &&
 		     mode == GraphicalInterface::InterfaceSelector::SELECTOR_MODE_SCORE) {
-
+		AutonSecondScoring auton = AutonSecondScoring(&chassis, &cata);
+		auton.run();
 	}
 	// fist position support mode (WP)
 	else if (position == GraphicalInterface::InterfaceSelector::SELECTOR_POSITION_1 &&
 		     mode == GraphicalInterface::InterfaceSelector::SELECTOR_MODE_SUPPORT) {
-
+		AutonFirstSupport auton = AutonFirstSupport(&chassis, &cata);
+		auton.run();
 	}
 	// idle mode
 	else if (mode == GraphicalInterface::InterfaceSelector::SELECTOR_MODE_IDLE) {

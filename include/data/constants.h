@@ -23,6 +23,10 @@ namespace Constants {
 		inline float ROTATION_I = 0.01;
 		inline float ROTATION_D = 100;
 	}
+	namespace DiskPursuit {
+		inline float PURSUE_RADIUS = 1;
+		inline float GIVEUP_RADIUS = 1.5;
+	}
 	namespace GraphicalInterface {
 		inline int SCREEN_WIDTH  = 480;
 		inline int SCREEN_HEIGHT = 272 - 30;

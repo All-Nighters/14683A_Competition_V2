@@ -11,7 +11,7 @@ Odom::Odom(struct Core* core, OdomMode mode) {
     this->STrackRadius = Constants::Robot::MIDDLE_ENCODER_DISTANCE.convert(meter) / 2;
 
     this->reset_variables();
-    // this->tare_sensors();
+    this->tare_sensors();
     
     odom_task = std::move(std::make_unique<pros::Task>(this->start_odom, this, "Odom"));
 }

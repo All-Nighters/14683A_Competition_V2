@@ -9,3 +9,7 @@ AutonFirstScoring::AutonFirstScoring(Chassis* chassis, Catapult* catapul, bool o
 AutonFirstScoring::~AutonFirstScoring() {
     this->chassis->moveVelocity(0);
 }
+
+void AutonFirstScoring::run() {
+    
+}
