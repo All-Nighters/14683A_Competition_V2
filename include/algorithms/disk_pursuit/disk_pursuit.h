@@ -5,7 +5,7 @@ class DiskPursuit {
         pros::vision_object_s_t get_closest_disk();
         float get_disk_distance(pros::vision_object_s_t object);
         float get_disk_direction(pros::vision_object_s_t object);
-        ChassisVelocityPair step();
+        ChassisVelocityPair step(bool reverse = false);
     private:
         struct Core* core;
         const float Kp = 1;

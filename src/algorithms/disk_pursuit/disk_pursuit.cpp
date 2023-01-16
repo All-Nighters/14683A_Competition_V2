@@ -59,7 +59,7 @@ float DiskPursuit::get_disk_direction(pros::vision_object_s_t object) {
  * 
  * @returns left and right drivetrain velocity 
  */
-ChassisVelocityPair DiskPursuit::step() {
+ChassisVelocityPair DiskPursuit::step(bool reverse) {
     ChassisVelocityPair velocity_pair;
     pros::vision_object_s_t object = this->get_closest_disk();
     if (object.signature == 255) return velocity_pair;
@@ -70,8 +70,13 @@ ChassisVelocityPair DiskPursuit::step() {
     float control_output = this->Kp * error + this->Ki * total_error_direction + this->Kd * deriv_error;
     prev_error_direction = error;
 
-    velocity_pair.left_v = Math::clamp(this->forward_velocity + control_output, -this->max_velocity, this->max_velocity);
-    velocity_pair.right_v = Math::clamp(this->forward_velocity - control_output, -this->max_velocity, this->max_velocity);
+    if (reverse) {
+        velocity_pair.left_v = Math::clamp(-(this->forward_velocity - control_output), -this->max_velocity, this->max_velocity);
+        velocity_pair.right_v = Math::clamp(-(this->forward_velocity + control_output), -this->max_velocity, this->max_velocity);
+    } else {
+        velocity_pair.left_v = Math::clamp(this->forward_velocity + control_output, -this->max_velocity, this->max_velocity);
+        velocity_pair.right_v = Math::clamp(this->forward_velocity - control_output, -this->max_velocity, this->max_velocity);
+    }
     
     return velocity_pair;
 }

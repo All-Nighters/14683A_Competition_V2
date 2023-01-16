@@ -364,7 +364,7 @@ void Chassis::followPath(std::vector<Coordinates> path, bool reverse, bool enabl
         if (enable_disk_pursuit) {
             if (is_pursuing_disk) {
                 if (this->disk_pursuit->get_disk_distance(closest_disk) < giveup_threash) {
-                    velocity_pair = this->disk_pursuit->step();
+                    velocity_pair = this->disk_pursuit->step(reverse);
                 } else {
                     is_pursuing_disk = false;
                     velocity_pair = this->pure_pursuit.step(position, reverse);
@@ -372,7 +372,7 @@ void Chassis::followPath(std::vector<Coordinates> path, bool reverse, bool enabl
             } else {
                 if (this->disk_pursuit->get_disk_distance(closest_disk) < pursuit_threash) {
                     is_pursuing_disk = true;
-                    velocity_pair = this->disk_pursuit->step();
+                    velocity_pair = this->disk_pursuit->step(reverse);
                 } else {
                     velocity_pair = this->pure_pursuit.step(position, reverse);
                 }
