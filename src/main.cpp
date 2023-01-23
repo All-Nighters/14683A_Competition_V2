@@ -110,19 +110,19 @@ void autonomous() {
 	// fist position scoring mode
 	if      (position == GraphicalInterface::InterfaceSelector::SELECTOR_POSITION_1 &&
 		     mode == GraphicalInterface::InterfaceSelector::SELECTOR_MODE_SCORE) {
-		AutonFirstScoring auton = AutonFirstScoring(&chassis, &cata);
+		AutonFirstScoring auton = AutonFirstScoring(&chassis, &cata, position_offset);
 		auton.run();
 	}
 	// second position scoring mode
 	else if (position == GraphicalInterface::InterfaceSelector::SELECTOR_POSITION_2 &&
 		     mode == GraphicalInterface::InterfaceSelector::SELECTOR_MODE_SCORE) {
-		AutonSecondScoring auton = AutonSecondScoring(&chassis, &cata);
+		AutonSecondScoring auton = AutonSecondScoring(&chassis, &cata, position_offset);
 		auton.run();
 	}
 	// fist position support mode (WP)
 	else if (position == GraphicalInterface::InterfaceSelector::SELECTOR_POSITION_1 &&
 		     mode == GraphicalInterface::InterfaceSelector::SELECTOR_MODE_SUPPORT) {
-		AutonFirstSupport auton = AutonFirstSupport(&chassis, &cata);
+		AutonFirstSupport auton = AutonFirstSupport(&chassis, &cata, position_offset);
 		auton.run();
 	}
 	// idle mode

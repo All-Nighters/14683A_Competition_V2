@@ -8,6 +8,7 @@
 Catapult::Catapult(struct Core* core) {
     this->triggered = false;
     this->voltage = 8000;
+    this->fire_delay = 0;
     this->core = core;
     this->reposition();
     this->core->catapult_motor->setBrakeMode(okapi::AbstractMotor::brakeMode::hold);
@@ -52,8 +53,11 @@ void Catapult::set_boost(bool use_boost) {
  * 
  * To shoot synchronously, add wait_until_reloaded() right after
  * calling fire().
+ * 
+ * @param fire_delay Miliseconds delayed between call and shot
  */
-void Catapult::fire() {
+void Catapult::fire(int fire_delay) {
+    this->fire_delay = fire_delay;
     this->triggered = true;
 }
 
@@ -87,6 +91,10 @@ void Catapult::shooting_loop_trampoline(void* iparam) {
 void Catapult::shooting_loop() {
     while (true) {
         if (this->triggered) {
+            if (fire_delay > 0) {
+                pros::delay(fire_delay);
+                fire_delay = 0;
+            }
             // rotate until it is not loaded
             while (this->core->catapult_load_sensor->get_value() != 0) {
                 this->core->catapult_motor->moveVoltage(this->voltage);

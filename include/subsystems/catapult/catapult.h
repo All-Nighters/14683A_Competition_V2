@@ -4,12 +4,13 @@ class Catapult {
         ~Catapult();
         void reposition();
         void set_boost(bool use_boost);
-        void fire();
+        void fire(int fire_delay = 0);
         void wait_until_reloaded();
     private:
         struct Core* core;
         bool triggered;
         float voltage;
+        int fire_delay;
         static void shooting_loop_trampoline(void* iparam);
         void shooting_loop();
         std::unique_ptr<pros::Task> shooting_task {nullptr};
