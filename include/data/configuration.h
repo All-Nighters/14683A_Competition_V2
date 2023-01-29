@@ -17,17 +17,17 @@ namespace Configuration {
         inline int CATAPULT = 8;
     };
 
+    inline int EXPANDER = 10;
     namespace Analog {
-        inline std::uint8_t     EXPANSION             = ' ';
-        inline std::uint8_t     ODOMETRY[2]           = {'A', 'B'};
-        inline std::uint8_t     IMU[2]                = {7, 8};
+        inline std::uint8_t     ODOMETRY[2]           = {'C', 'D'};
+        inline std::uint8_t     IMU[2]                = {12, 14};
     };
 
     namespace Digital {
-        inline std::uint8_t     CATAPULT_LOAD_SENSOR = 'C';
-        inline std::uint8_t     VISION_GOAL          = 1;
-        inline std::uint8_t     VISION_INTAKE        = 9;
-        inline std::uint8_t     OPTICAL_ROLLER       = 2;
+        inline std::uint8_t     CATAPULT_LOAD_SENSOR = 'H';
+        inline std::uint8_t     BOOSTER              = 'F';
+        inline std::uint8_t     EXPANSION            = 'A';
+        inline std::uint8_t     VISION_GOAL          = 13;
     }
 
     namespace Controls {

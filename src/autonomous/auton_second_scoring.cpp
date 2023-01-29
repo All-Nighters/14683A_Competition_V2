@@ -1,8 +1,9 @@
 #include "main.h"
 
-AutonSecondScoring::AutonSecondScoring(Chassis* chassis, Catapult* catapul, bool offset) {
+AutonSecondScoring::AutonSecondScoring(Chassis* chassis, Catapult* catapult, Intake* intake, bool offset) {
     this->chassis = chassis;
     this->catapult = catapult;
+    this->intake = intake;
     this->offset = offset;
 }
 

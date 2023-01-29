@@ -59,7 +59,6 @@ typedef struct ChassisVelocityPair {
 // algorithms
 #include "algorithms/odometry/odometry.h"
 #include "algorithms/motion_profile/motion_profile.h"
-#include "algorithms/disk_pursuit/disk_pursuit.h"
 
 // subsystems
 #include "subsystems/chassis/chassis.h"
@@ -100,6 +99,7 @@ extern "C" {
 struct Core {
 	// controller
 	okapi::Controller*   controller;
+	okapi::Controller*   partner;
 	// chassis
 	okapi::Motor*        chassis_left_front;
 	okapi::Motor*        chassis_left_middle;
@@ -111,8 +111,7 @@ struct Core {
 	okapi::Motor*        intake;
 	okapi::Motor*        roller;
 	okapi::Motor*        catapult_motor;
-	pros::ADIDigitalOut* piston_booster_left;
-	pros::ADIDigitalOut* piston_booster_right;
+	pros::ADIDigitalOut* piston_booster;
 	pros::ADIDigitalOut* expansion;
 	pros::ADIDigitalOut* blocker;
 	// sensors
@@ -125,8 +124,6 @@ struct Core {
 	pros::Imu*           imu_second;
 	pros::ADIDigitalIn*  catapult_load_sensor;
 	pros::Vision*        vision_goal;
-	pros::Vision*        vision_intake;
-	pros::Optical*       optical_roller;
 	
 };
 

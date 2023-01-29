@@ -1,8 +1,9 @@
 #include "main.h"
 
-AutonFirstSupport::AutonFirstSupport(Chassis* chassis, Catapult* catapul, bool offset) {
+AutonFirstSupport::AutonFirstSupport(Chassis* chassis, Catapult* catapult, Intake* intake, bool offset) {
     this->chassis = chassis;
     this->catapult = catapult;
+    this->intake = intake;
     this->offset = offset;
 }
 

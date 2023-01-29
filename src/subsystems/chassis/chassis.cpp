@@ -7,8 +7,7 @@
  */
 Chassis::Chassis(struct Core* core) {
     this->core = core;
-    this->pure_pursuit = PurePursuit();
-    this->disk_pursuit = std::make_unique<DiskPursuit>(core);
+    this->pure_pursuit = PurePursuit(600);
     this->odom_enabled = false;
     this->motor_gearset = AbstractMotor::gearset::blue;
     this->maximum_velocity = 600;
@@ -25,7 +24,6 @@ Chassis::Chassis(struct Core* core) {
 Chassis::Chassis(struct Core* core, Odom* odom) {
     this->core = core;
     this->pure_pursuit = PurePursuit();
-    this->disk_pursuit = std::make_unique<DiskPursuit>(core);
     this->odom = odom;
     this->odom_enabled = true;
     this->motor_gearset = AbstractMotor::gearset::blue;
@@ -138,26 +136,26 @@ void Chassis::moveVoltage(float left_volt, float right_volt) {
  */
 void Chassis::moveDistance(float pct, float max_voltage) {
     float target_distance    = Constants::Field::FIELD_LENGTH * pct / 100;
-    float revs               = target_distance / (M_PI*(Constants::Robot::WHEEL_DIAMETER.convert(meter))); // # of revolutions of wheels
+    float revs               = target_distance / (M_PI*(Constants::Robot::TRACKING_WHEEL_DIAMETER.convert(meter))); // # of revolutions of wheels
     float targetAngle        = revs * 360 + this->getLeftPosition();
     float targetFaceAngle    = (this->imu1->get_rotation() + this->imu2->get_rotation()) / 2; 
     float start_time         = pros::millis();  
     int direction            = revs < 0 ? -1 : 1;
     float timeout            = 10; // maximum runtime in seconds
     
-    float prev_error_position  = abs(targetAngle - this->getLeftPosition());
+    float prev_error_position   = abs(targetAngle -  this->core->middle_tracking_wheel->get());
+    float prev_control_output   = 0;
     float prev_face_angle_error = 0;
-    float total_error_position = 0;
-    float total_error_facing = 0;
+    float total_error_position  = 0;
+    float total_error_facing    = 0;
 
 
-    while (abs(targetAngle - this->getLeftPosition()) >= 10 && 
+    while (abs(targetAngle -  this->core->middle_tracking_wheel->get()) >= 10 && 
     pros::millis() - start_time <= timeout*1000) {
 
-        float error_position = abs(targetAngle - this->getLeftPosition());
+        float error_position = targetAngle - this->core->middle_tracking_wheel->get();
         total_error_position += error_position;
 
-        prev_error_position = abs(targetAngle - this->getLeftPosition());
         float error_facing = targetFaceAngle - ((this->imu1->get_rotation() + this->imu2->get_rotation()) / 2);
         total_error_facing += error_facing;
 
@@ -168,15 +166,22 @@ void Chassis::moveDistance(float pct, float max_voltage) {
         float control_output = error_position * this->Tp + total_error_position * this->Ti + deriv_position * this->Td;
         float control_output_facing = error_facing * this->Dp + total_error_facing * this->Di + deriv_facing * this->Dd;
 
-        float control_output_Left = direction * std::fmax(std::fmin(control_output, max_voltage), -max_voltage) + std::fmax(std::fmin(control_output_facing, max_voltage * 0.25), -max_voltage * 0.25);
-        float control_output_Right = direction * std::fmax(std::fmin(control_output, max_voltage), -max_voltage) - std::fmax(std::fmin(control_output_facing, max_voltage * 0.25), -max_voltage * 0.25);
+        float deriv_control_output = control_output - prev_control_output;
+        if ((int)deriv_control_output / abs((int) deriv_control_output) == direction &&
+            abs(deriv_control_output) > 400) {
+            control_output = prev_control_output + direction * 400;
+        }
+
+        float control_output_Left  = std::fmax(std::fmin(control_output, max_voltage), -max_voltage) + std::fmax(std::fmin(control_output_facing, max_voltage * 0.25), -max_voltage * 0.25);
+        float control_output_Right = std::fmax(std::fmin(control_output, max_voltage), -max_voltage) - std::fmax(std::fmin(control_output_facing, max_voltage * 0.25), -max_voltage * 0.25);
         if (abs(control_output_Left) < 2000) {
             control_output_Left = direction * 2000;
         }
-        else if (abs(control_output_Right) < 2000) {
+        if (abs(control_output_Right) < 2000) {
             control_output_Right = direction * 2000;
         }
         prev_error_position = error_position;
+        prev_control_output = control_output;
         this->moveVoltage(control_output_Left, control_output_Right);
         pros::delay(20);
     }
@@ -197,21 +202,21 @@ void Chassis::turnAngle(float angle) {
     float timeout = 10; // maximum runtime in seconds
 
     while (abs(target_angle - current_rotation) >= 1 && pros::millis() - start_time <= timeout*1000) {
+        current_rotation = (this->imu1->get_rotation() + this->imu2->get_rotation())/2.0;
         float error = target_angle - current_rotation;
         total_error += error;
         float deriv_error = error - prev_error;
 
         float control_output = Math::clamp(error * this->Rp + total_error * this->Ri + deriv_error * this->Rd, -12000, 12000);
 
-        if (abs(control_output) < 2000) {
-            control_output = control_output > 0 ? 2000 : -2000;
+        if (abs(control_output) < 3000) {
+            control_output = control_output > 0 ? 3000 : -3000;
         }
 
         prev_error = error;
 
         this->moveVoltage(control_output, -control_output);
         pros::delay(20);
-        current_rotation = (this->imu1->get_rotation() + this->imu2->get_rotation())/2.0;
     }
 
     this->moveVoltage(0);
@@ -235,16 +240,17 @@ void Chassis::faceAngle(float angle) {
     float start_time = pros::millis();  
     float timeout = 10; // maximum runtime in seconds
 
-    while (abs(Math::format_angle(target_angle) - Math::format_angle(robot_state.theta)) >= 0.5 && pros::millis() - start_time <= timeout*1000) {
+    while (abs(Math::format_angle(target_angle) - Math::format_angle(robot_state.theta)) >= 1 && pros::millis() - start_time <= timeout*1000) {
         robot_state = this->odom->getState();
 
         float error = Math::format_angle(target_angle) - Math::format_angle(robot_state.theta);
+        printf("%f\n", error);
         float deriv_error = error - prev_error;
 
         float control_output = Math::clamp(error * this->Rp + deriv_error * this->Rd, -12000, 12000);
 
-        if (abs(control_output) < 2000) {
-            control_output = control_output > 0 ? 2000 : -2000;
+        if (abs(control_output) < 3000) {
+            control_output = control_output > 0 ? 3000 : -3000;
         }
 
         prev_error = error;
@@ -323,6 +329,10 @@ void Chassis::simpleMoveToPoint(float xPercent, float yPercent) {
     float dist = sqrt(xDist*xDist + yDist*yDist);
 
     this->faceCoordinate(xPercent, yPercent);
+    position = this->odom->getState();
+    xDist = xPercent - position.x_pct;
+    yDist = yPercent - position.y_pct;
+    dist = sqrt(xDist*xDist + yDist*yDist);
     this->moveDistance(dist);
 }
 
@@ -339,6 +349,10 @@ void Chassis::simpleMoveToPointBackwards(float xPercent, float yPercent) {
     float dist = sqrt(xDist*xDist + yDist*yDist);
 
     this->faceCoordinate(position.x_pct - xDist, position.y_pct - yDist);
+    position = this->odom->getState();
+    xDist = xPercent - position.x_pct;
+    yDist = yPercent - position.y_pct;
+    dist = sqrt(xDist*xDist + yDist*yDist);
     this->moveDistance(-dist);
     
 
@@ -351,7 +365,7 @@ void Chassis::simpleMoveToPointBackwards(float xPercent, float yPercent) {
  * @param reverse whether the robot should move backwards to pursue the path
  * @param enable_disk_pursuit whether the robot should pursue nearby disks
  */
-void Chassis::followPath(std::vector<Coordinates> path, bool reverse, bool enable_disk_pursuit) {
+void Chassis::followPath(std::vector<Coordinates> path, bool reverse) {
     float pursuit_threash = Constants::DiskPursuit::PURSUE_RADIUS; // distance threashold to pursue disk
     float giveup_threash = Constants::DiskPursuit::GIVEUP_RADIUS; // distance threashold to giveup disk
     bool is_pursuing_disk = false;
@@ -360,26 +374,7 @@ void Chassis::followPath(std::vector<Coordinates> path, bool reverse, bool enabl
     while (!this->pure_pursuit.is_arrived()) {
         RobotPosition position = this->odom->getState();
         ChassisVelocityPair velocity_pair;
-        pros::vision_object_s_t closest_disk = disk_pursuit->get_closest_disk();
-        if (enable_disk_pursuit) {
-            if (is_pursuing_disk) {
-                if (this->disk_pursuit->get_disk_distance(closest_disk) < giveup_threash) {
-                    velocity_pair = this->disk_pursuit->step(reverse);
-                } else {
-                    is_pursuing_disk = false;
-                    velocity_pair = this->pure_pursuit.step(position, reverse);
-                }
-            } else {
-                if (this->disk_pursuit->get_disk_distance(closest_disk) < pursuit_threash) {
-                    is_pursuing_disk = true;
-                    velocity_pair = this->disk_pursuit->step(reverse);
-                } else {
-                    velocity_pair = this->pure_pursuit.step(position, reverse);
-                }
-            }
-        } else {
-            velocity_pair = this->pure_pursuit.step(position, reverse);
-        }
+        velocity_pair = this->pure_pursuit.step(position, reverse);
         this->moveVelocity(velocity_pair.left_v, velocity_pair.right_v);
         pros::delay(10);
     }
@@ -392,7 +387,7 @@ void Chassis::followPath(std::vector<Coordinates> path, bool reverse, bool enabl
  * @return left track motor position reading
  */
 float Chassis::getLeftPosition() {
-    return (this->core->chassis_left_front->getPosition() + this->core->chassis_left_middle->getPosition()  + this->core->chassis_left_back->getPosition());
+    return (this->core->chassis_left_front->getPosition() + this->core->chassis_left_middle->getPosition() + this->core->chassis_left_back->getPosition()) / 3 * 36/60 / 77*90;
 }
 
 /**
@@ -401,7 +396,7 @@ float Chassis::getLeftPosition() {
  * @return right track motor position reading
  */
 float Chassis::getRightPosition() {
-    return (this->core->chassis_right_front->getPosition() + this->core->chassis_right_middle->getPosition()  + this->core->chassis_right_back->getPosition());
+    return (this->core->chassis_right_front->getPosition() + this->core->chassis_right_middle->getPosition() + this->core->chassis_right_back->getPosition()) / 3 * 36/60 / 77*90;
 }
 
 float Chassis::skim(float v) {

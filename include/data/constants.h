@@ -20,8 +20,8 @@ namespace Constants {
 		inline float DISPLACEMENT_I = 0.01;
 		inline float DISPLACEMENT_D = 500;
 		inline float ROTATION_P = 300;
-		inline float ROTATION_I = 0.01;
-		inline float ROTATION_D = 100;
+		inline float ROTATION_I = 0.1;
+		inline float ROTATION_D = 200;
 	}
 	namespace DiskPursuit {
 		inline float PURSUE_RADIUS = 1;

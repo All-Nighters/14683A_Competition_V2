@@ -96,7 +96,7 @@ int PurePursuit::closest(RobotPosition position) {
         float dist = sqrt(x_dist * x_dist + y_dist * y_dist);
         if (dist < min_distance) {
             min_distance = dist;
-            min_idx = 0;
+            min_idx = i;
         }
     }
     return min_idx;
@@ -198,7 +198,7 @@ Coordinates PurePursuit::absToLocal(RobotPosition position, Coordinates point) {
  */
 ChassisVelocityPair PurePursuit::step(RobotPosition position, bool reverse) {
     ChassisVelocityPair velocity_pair;
-    if (!this->arrived && this->closest(position) != this->path.size()-1) {
+    if (!this->arrived && this->closest(position) < this->path.size()-1) {
         this->arrived = false;
         Coordinates look_ahead = this->getLookAheadPoint(position);
         Coordinates local_look_ahead = this->absToLocal(position, look_ahead);

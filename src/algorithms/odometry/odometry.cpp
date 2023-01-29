@@ -1,4 +1,4 @@
-#define DEBUG true
+#define DEBUG false
 #include "main.h"
 
 Odom::Odom(struct Core* core, OdomMode mode) { 
@@ -311,7 +311,7 @@ void Odom::position_tracking() {
                 this->deltaYLocal  = 2 * sin(this->deltaTheta / 2.0) * ((this->deltaDistR / this->deltaTheta) + this->RTrackRadius);
             }
             else if (this->odometry_mode == OdomMode::MIDDLETW_IMU) {
-                this->deltaYLocal  = 2 * sin(this->deltaTheta / 2.0) * ((this->deltaDistR / this->deltaTheta));
+                this->deltaYLocal  = 2 * sin(this->deltaTheta / 2.0) * ((this->deltaDistR / this->deltaTheta) + 0.01);
             }
             
         }
@@ -330,7 +330,7 @@ void Odom::position_tracking() {
         this->position.y_meter = this->yPosGlobal;
         this->position.x_pct   = this->xPosGlobal / Constants::Field::FIELD_LENGTH * 100;
         this->position.y_pct   = this->yPosGlobal / Constants::Field::FIELD_LENGTH * 100;
-        this->position.theta   = this->currentAbsoluteOrientation;
+        this->position.theta   = this->currentAbsoluteOrientation * 180 / M_PI;
 
         pros::delay(10);
 

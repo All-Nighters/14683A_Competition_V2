@@ -23,7 +23,7 @@ class Chassis {
         void simpleMoveToPoint(float x, float y);
         void simpleMoveToPointBackwards(float x, float y);
 
-        void followPath(std::vector<Coordinates> path, bool reverse = false, bool enable_disk_pursuit = false);
+        void followPath(std::vector<Coordinates> path, bool reverse = false);
 
         // position sensing functions
         float getLeftPosition();
@@ -33,26 +33,25 @@ class Chassis {
         // driver control functions
         float skim(float v);
         void cheezyDrive(float throttle, float turn);
+        Odom* odom;
     private:
         // translational PID constants
         const float Tp = 5;
-        const float Ti = 0;
-        const float Td = 0;
+        const float Ti = 0.015;
+        const float Td = 10;
 
         // rotational PID constants
-        const float Rp = 150;
-        const float Ri = 0;
-        const float Rd = 0;
+        const float Rp = 70;
+        const float Ri = 0.01;
+        const float Rd = 280;
 
         // directional PID constants (help driving straight)
-        const float Dp = 1;
-        const float Di = 0;
-        const float Dd = 0;
+        const float Dp = 200;
+        const float Di = 0.1;
+        const float Dd = 200;
 
         struct Core* core;
-        Odom* odom;
         PurePursuit pure_pursuit;
-        std::unique_ptr<DiskPursuit> disk_pursuit;
         bool odom_enabled;
         AbstractMotor::gearset motor_gearset;
         float maximum_velocity;
