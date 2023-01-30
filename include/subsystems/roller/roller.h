@@ -1,15 +1,15 @@
-enum class RollerColor {RED, BLUE, NONE};
+enum class RollerDirection {FORWARD, BACKWARD, NONE};
 class Roller {
     public:
+        Roller();
         Roller(struct Core* core);
         ~Roller();
-        void rollto(RollerColor color);
+        void rollto(RollerDirection color);
     private:
         void roller_loop();
         static void roller_loop_trampoline(void* iparam);
 
-        const int timeout = 10000;
         struct Core* core;
-        RollerColor target_color;
+        RollerDirection target_direction;
         std::unique_ptr<pros::Task> roller_task {nullptr};
 };

@@ -3,10 +3,13 @@ class Catapult {
         Catapult(struct Core* core);
         ~Catapult();
         void reposition();
+        void reset();
         void set_boost(bool use_boost);
         void fire(int fire_delay = 0);
         void wait_until_reloaded();
+        static bool continue_shooting;
     private:
+        bool use_boost;
         struct Core* core;
         bool triggered;
         float voltage;

@@ -1,5 +1,6 @@
 #include "main.h"
 
+
 /**
  * @brief Construct a new Chassis:: Chassis object
  * 
@@ -13,6 +14,10 @@ Chassis::Chassis(struct Core* core) {
     this->maximum_velocity = 600;
     this->imu1 = core->imu_first;
     this->imu2 = core->imu_second;
+    this->vision = std::move(std::make_unique<Vision>(core));
+    std::vector<pros::vision_signature_s_t> signatures;
+    this->vision->set_signatures(signatures);
+    printf("Chassis created\n");
 }
 
 /**
@@ -21,7 +26,7 @@ Chassis::Chassis(struct Core* core) {
  * @param core Core structure pointer
  * @param odom Odom structure pointer
  */
-Chassis::Chassis(struct Core* core, Odom* odom) {
+Chassis::Chassis(struct Core* core, std::shared_ptr<Odom> odom) {
     this->core = core;
     this->pure_pursuit = PurePursuit();
     this->odom = odom;
@@ -30,6 +35,10 @@ Chassis::Chassis(struct Core* core, Odom* odom) {
     this->maximum_velocity = 600;
     this->imu1 = core->imu_first;
     this->imu2 = core->imu_second;
+    this->vision = std::move(std::make_unique<Vision>(core));
+    std::vector<pros::vision_signature_s_t> signatures;
+    this->vision->set_signatures(signatures);
+    printf("finished chassis\n");
 }
 
 /**
@@ -38,6 +47,7 @@ Chassis::Chassis(struct Core* core, Odom* odom) {
  */
 Chassis::~Chassis() {
     this->moveVelocity(0);
+    printf("Chassis destroyed\n");
 }
 
 /**
@@ -366,11 +376,8 @@ void Chassis::simpleMoveToPointBackwards(float xPercent, float yPercent) {
  * @param enable_disk_pursuit whether the robot should pursue nearby disks
  */
 void Chassis::followPath(std::vector<Coordinates> path, bool reverse) {
-    float pursuit_threash = Constants::DiskPursuit::PURSUE_RADIUS; // distance threashold to pursue disk
-    float giveup_threash = Constants::DiskPursuit::GIVEUP_RADIUS; // distance threashold to giveup disk
-    bool is_pursuing_disk = false;
     this->pure_pursuit.set_path(path);
-
+    
     while (!this->pure_pursuit.is_arrived()) {
         RobotPosition position = this->odom->getState();
         ChassisVelocityPair velocity_pair;
@@ -379,6 +386,7 @@ void Chassis::followPath(std::vector<Coordinates> path, bool reverse) {
         pros::delay(10);
     }
     this->moveVelocity(0);
+
 }
 
 /**
@@ -453,4 +461,23 @@ void Chassis::cheezyDrive(float throttle, float turn) {
             Math::clamp(right * this->maximum_velocity, -this->maximum_velocity, this->maximum_velocity)
         );
     } 
+}
+
+void Chassis::auto_aim() {
+    float angle = this->vision->get_direction();
+
+    float current_rotation = (this->imu1->get_rotation() + this->imu2->get_rotation())/2.0;
+    float target_angle = current_rotation + angle;
+    float prev_error = abs(angle);
+    float total_error = 0;
+
+    float error = target_angle - current_rotation;
+    total_error += error;
+    float deriv_error = error - prev_error;
+
+    float control_output = Math::clamp(error * this->Rp + total_error * this->Ri + deriv_error * this->Rd, -12000, 12000);
+
+    prev_error = error;
+
+    this->moveVoltage(control_output, -control_output);
 }

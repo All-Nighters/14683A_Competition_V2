@@ -333,6 +333,7 @@ void GraphicalInterface::interface_rerender() {
             {GraphicalInterface::InterfaceSelector::SELECTOR_POSITION_1,       "#1"},
             {GraphicalInterface::InterfaceSelector::SELECTOR_POSITION_2,       "#2"}
         };
+        
         GraphicalInterface::InterfaceSelector selector_description_round    = std::any_cast<GraphicalInterface::InterfaceSelector>(GraphicalInterface::interface_configuration[GraphicalInterface::InterfaceConfiguration::GAME_ROUND]);
         GraphicalInterface::InterfaceSelector selector_description_team     = std::any_cast<GraphicalInterface::InterfaceSelector>(GraphicalInterface::interface_configuration[GraphicalInterface::InterfaceConfiguration::GAME_TEAM]);
         GraphicalInterface::InterfaceSelector selector_description_mode     = std::any_cast<GraphicalInterface::InterfaceSelector>(GraphicalInterface::interface_configuration[GraphicalInterface::InterfaceConfiguration::GAME_MODE]);

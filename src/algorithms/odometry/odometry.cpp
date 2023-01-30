@@ -1,6 +1,10 @@
 #define DEBUG false
 #include "main.h"
 
+Odom::Odom() {
+
+}
+
 Odom::Odom(struct Core* core, OdomMode mode) { 
     // Note: make sure all sensors required by the odometry mode are plugged in
     this->core = core;
@@ -14,11 +18,13 @@ Odom::Odom(struct Core* core, OdomMode mode) {
     this->tare_sensors();
     
     odom_task = std::move(std::make_unique<pros::Task>(this->start_odom, this, "Odom"));
+    printf("Odom created\n");
 }
 
 Odom::~Odom() {
     odom_task->remove();
     odom_task.reset(nullptr);
+    printf("Odom destroyed\n");
 }
 
 void Odom::start_odom(void* iparam){

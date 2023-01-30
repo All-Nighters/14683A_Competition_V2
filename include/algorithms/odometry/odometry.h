@@ -19,6 +19,7 @@ enum class OdomMode {
 
 class Odom {
     public:
+        Odom();
         Odom(struct Core* core, OdomMode mode);
         ~Odom();
         RobotPosition getState();

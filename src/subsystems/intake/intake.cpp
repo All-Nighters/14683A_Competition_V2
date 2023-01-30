@@ -1,11 +1,17 @@
 #include "main.h"
 
+Intake::Intake() {
+
+}
+
 Intake::Intake(struct Core* core) {
     this->core = core;
+    printf("finished intake\n");
 }
 
 Intake::~Intake() {
     this->turn_off();
+    printf("intake destroyed\n");
 }
 void Intake::turn_on() {
     this->core->intake->moveVoltage(-12000);

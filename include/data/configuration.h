@@ -27,6 +27,10 @@ namespace Configuration {
         inline std::uint8_t     CATAPULT_LOAD_SENSOR = 'H';
         inline std::uint8_t     BOOSTER              = 'F';
         inline std::uint8_t     EXPANSION            = 'A';
+        inline std::uint8_t     BLOCKER_LEFT         = 'B';
+        inline std::uint8_t     BLOCKER_RIGHT        = 'E';
+        inline std::uint8_t     BLOCKER_TOP          = 'D';
+
         inline std::uint8_t     VISION_GOAL          = 13;
     }
 
@@ -35,7 +39,7 @@ namespace Configuration {
         inline ControllerAnalog  TURN_AXIS         = ControllerAnalog::rightX;
 
         inline ControllerDigital INTAKE_BUTTON     = ControllerDigital::R1;
-        inline ControllerDigital INTAKE_BUTTON_REV = ControllerDigital::A;
+        inline ControllerDigital BOOST_BUTTON      = ControllerDigital::A;
         inline ControllerDigital SHOOT_BUTTON      = ControllerDigital::L2;
         inline ControllerDigital ROLL_BUTTON       = ControllerDigital::L2;
         inline ControllerDigital EXPANSION_BUTTON  = ControllerDigital::up;

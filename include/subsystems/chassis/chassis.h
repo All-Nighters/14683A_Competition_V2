@@ -5,7 +5,7 @@ using namespace okapi;
 class Chassis {
     public:
         Chassis(struct Core* core);
-        Chassis(struct Core* core, Odom* odom);
+        Chassis(struct Core* core, std::shared_ptr<Odom> odom);
         ~Chassis();
         void setBrakeMode(AbstractMotor::brakeMode brake_mode);
 
@@ -33,25 +33,27 @@ class Chassis {
         // driver control functions
         float skim(float v);
         void cheezyDrive(float throttle, float turn);
-        Odom* odom;
+        void auto_aim();
+        std::shared_ptr<Odom> odom;
     private:
         // translational PID constants
-        const float Tp = 5;
-        const float Ti = 0.015;
-        const float Td = 10;
+        float Tp = 5;
+        float Ti = 0.015;
+        float Td = 10;
 
         // rotational PID constants
-        const float Rp = 70;
-        const float Ri = 0.01;
-        const float Rd = 280;
+        float Rp = 70;
+        float Ri = 0.01;
+        float Rd = 280;
 
-        // directional PID constants (help driving straight)
-        const float Dp = 200;
-        const float Di = 0.1;
-        const float Dd = 200;
+        // directional PID constants
+        float Dp = 200;
+        float Di = 0.1;
+        float Dd = 200;
 
         struct Core* core;
         PurePursuit pure_pursuit;
+        std::unique_ptr<Vision> vision {nullptr};
         bool odom_enabled;
         AbstractMotor::gearset motor_gearset;
         float maximum_velocity;
