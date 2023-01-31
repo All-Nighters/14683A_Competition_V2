@@ -30,9 +30,34 @@ PurePursuit::PurePursuit(std::vector<Coordinates> input_path, float max_velocity
 }
 
 /**
+ * @brief Construct a new Pure Pursuit:: Pure Pursuit object
+ * 
+ * @param input_path path to follow
+ * @param max_velocity maximum path following velocity
+ */
+PurePursuit::PurePursuit(float Tp, float Ti, float Td, float max_velocity) {
+    this->max_velocity = max_velocity;
+    this->look_ahead_radius = Constants::PurePursuit::LOOKAHEAD_RADIUS;
+
+    this->init(Tp, Ti, Td);
+}
+
+/**
  * @brief Pure pursuit initialization function
  * 
  */
+void PurePursuit::init(float Tp, float Ti, float Td) {
+    this->reset_error();
+
+    this->kP_displacement = Tp;
+    this->kI_displacement = Ti;
+    this->kD_displacement = Td;
+
+    this->kP_rotation = Constants::PurePursuit::ROTATION_P;
+    this->kI_rotation = Constants::PurePursuit::ROTATION_I;
+    this->kD_rotation = Constants::PurePursuit::ROTATION_D;
+}
+
 void PurePursuit::init() {
     this->reset_error();
 

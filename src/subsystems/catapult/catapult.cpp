@@ -40,15 +40,16 @@ Catapult::~Catapult() {
  * 
  */
 void Catapult::reposition() {
-    bool boost = this->use_boost; 
     // rotate until it is loaded again
-    while (this->core->catapult_load_sensor->get_value() == 0) {
+    if (this->core->catapult_load_sensor->get_value() == 0) {
         this->core->piston_booster->set_value(false);
+    }
+    while (this->core->catapult_load_sensor->get_value() == 0) {
         this->core->catapult_motor->moveVoltage(this->voltage);
         // printf("Sensor Value: %d\n", this->core->catapult_load_sensor->get_value()); 
         pros::delay(20);
     }
-    this->core->piston_booster->set_value(boost);
+    this->core->piston_booster->set_value(this->use_boost);
     // printf("Loaded\n"); 
     this->core->catapult_motor->moveVoltage(0);
 }
@@ -115,6 +116,7 @@ void Catapult::shooting_loop() {
                 this->core->catapult_motor->moveVoltage(this->voltage);
                 pros::delay(20);
             }
+            pros::delay(200);
             this->reposition();
             this->triggered = false;
         }

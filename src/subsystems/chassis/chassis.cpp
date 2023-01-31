@@ -28,7 +28,22 @@ Chassis::Chassis(struct Core* core) {
  */
 Chassis::Chassis(struct Core* core, std::shared_ptr<Odom> odom) {
     this->core = core;
-    this->pure_pursuit = PurePursuit();
+    this->pure_pursuit = PurePursuit(600);
+    this->odom = odom;
+    this->odom_enabled = true;
+    this->motor_gearset = AbstractMotor::gearset::blue;
+    this->maximum_velocity = 600;
+    this->imu1 = core->imu_first;
+    this->imu2 = core->imu_second;
+    this->vision = std::move(std::make_unique<Vision>(core));
+    std::vector<pros::vision_signature_s_t> signatures;
+    this->vision->set_signatures(signatures);
+    printf("finished chassis\n");
+}
+
+Chassis::Chassis(struct Core* core, std::shared_ptr<Odom> odom, float pursuit_Tp, float pursuit_Ti, float pursuit_Td) {
+    this->core = core;
+    this->pure_pursuit = PurePursuit(pursuit_Tp, pursuit_Ti, pursuit_Td, 600);
     this->odom = odom;
     this->odom_enabled = true;
     this->motor_gearset = AbstractMotor::gearset::blue;
@@ -184,11 +199,11 @@ void Chassis::moveDistance(float pct, float max_voltage) {
 
         float control_output_Left  = std::fmax(std::fmin(control_output, max_voltage), -max_voltage) + std::fmax(std::fmin(control_output_facing, max_voltage * 0.25), -max_voltage * 0.25);
         float control_output_Right = std::fmax(std::fmin(control_output, max_voltage), -max_voltage) - std::fmax(std::fmin(control_output_facing, max_voltage * 0.25), -max_voltage * 0.25);
-        if (abs(control_output_Left) < 2000) {
-            control_output_Left = direction * 2000;
+        if (abs(control_output_Left) < 3000) {
+            control_output_Left = direction * 3000;
         }
-        if (abs(control_output_Right) < 2000) {
-            control_output_Right = direction * 2000;
+        if (abs(control_output_Right) < 3000) {
+            control_output_Right = direction * 3000;
         }
         prev_error_position = error_position;
         prev_control_output = control_output;
@@ -280,7 +295,7 @@ void Chassis::faceAngle(float angle) {
  * @param xPercent x coordinate of the target in percents
  * @param yPercent y coordinate of the target in percents
  */
-void Chassis::faceCoordinate(float xPercent, float yPercent) {
+void Chassis::faceCoordinate(float xPercent, float yPercent, float angle_offset) {
     if (!this->odom_enabled) { // odometry not configured
         printf("Cannot run faceAngle because odometry is not enabled\n");
         return;
@@ -321,7 +336,7 @@ void Chassis::faceCoordinate(float xPercent, float yPercent) {
 
     float faceAngle;
 
-    faceAngle = Math::format_angle(relativeAngle - position.theta);
+    faceAngle = Math::format_angle(relativeAngle - position.theta + angle_offset);
 
     turnAngle(faceAngle);
 }
@@ -352,7 +367,7 @@ void Chassis::simpleMoveToPoint(float xPercent, float yPercent) {
  * @param xPercent x coordinate of the target
  * @param yPercent y coordinate of the target
  */
-void Chassis::simpleMoveToPointBackwards(float xPercent, float yPercent) {
+void Chassis::simpleMoveToPointBackwards(float xPercent, float yPercent, float max_voltage) {
     RobotPosition position = this->odom->getState();
     float xDist = xPercent - position.x_pct;
     float yDist = yPercent - position.y_pct;
@@ -363,7 +378,7 @@ void Chassis::simpleMoveToPointBackwards(float xPercent, float yPercent) {
     xDist = xPercent - position.x_pct;
     yDist = yPercent - position.y_pct;
     dist = sqrt(xDist*xDist + yDist*yDist);
-    this->moveDistance(-dist);
+    this->moveDistance(-dist, max_voltage);
     
 
 }

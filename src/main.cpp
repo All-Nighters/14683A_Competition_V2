@@ -19,7 +19,8 @@ okapi::Motor        intake                = okapi::Motor(Configuration::Motors::
 okapi::Motor        roller                = okapi::Motor(Configuration::Motors::ROLLER);
 okapi::Motor        catapult              = okapi::Motor(Configuration::Motors::CATAPULT);
 pros::ADIDigitalOut piston_booster        = pros::ADIDigitalOut({{Configuration::EXPANDER, Configuration::Digital::BOOSTER}});
-pros::ADIDigitalOut expansion             = pros::ADIDigitalOut(Configuration::Digital::EXPANSION);
+pros::ADIDigitalOut expansion_left        = pros::ADIDigitalOut(Configuration::Digital::EXPANSION_LEFT);
+pros::ADIDigitalOut expansion_right       = pros::ADIDigitalOut(Configuration::Digital::EXPANSION_RIGHT);
 pros::ADIDigitalOut blocker_left          = pros::ADIDigitalOut(Configuration::Digital::BLOCKER_LEFT);
 pros::ADIDigitalOut blocker_right         = pros::ADIDigitalOut(Configuration::Digital::BLOCKER_RIGHT);
 pros::ADIDigitalOut blocker_top           = pros::ADIDigitalOut(Configuration::Digital::BLOCKER_TOP);
@@ -52,7 +53,8 @@ void initialize() {
 	// accessories
 	core.intake               = &intake;
 	core.roller               = &roller;
-	core.expansion            = &expansion;
+	core.expansion_left       = &expansion_left;
+	core.expansion_right      = &expansion_right;
 	core.catapult_motor       = &catapult;
 	core.piston_booster       = &piston_booster;
 	core.blocker_left         = &blocker_left;
@@ -109,49 +111,45 @@ void competition_initialize() {}
  */
 void autonomous() {
 
-	// GraphicalInterface::InterfaceSelector position = GraphicalInterface::get_selector(GraphicalInterface::InterfaceConfiguration::GAME_POSITION);
-	// GraphicalInterface::InterfaceSelector game_team = GraphicalInterface::get_selector(GraphicalInterface::InterfaceConfiguration::GAME_TEAM);
-	// GraphicalInterface::InterfaceSelector mode = GraphicalInterface::get_selector(GraphicalInterface::InterfaceConfiguration::GAME_MODE);
-	// GraphicalInterface::InterfaceSelector game_round = GraphicalInterface::get_selector(GraphicalInterface::InterfaceConfiguration::GAME_ROUND);
+	GraphicalInterface::InterfaceSelector position = GraphicalInterface::get_selector(GraphicalInterface::InterfaceConfiguration::GAME_POSITION);
+	GraphicalInterface::InterfaceSelector game_team = GraphicalInterface::get_selector(GraphicalInterface::InterfaceConfiguration::GAME_TEAM);
+	GraphicalInterface::InterfaceSelector mode = GraphicalInterface::get_selector(GraphicalInterface::InterfaceConfiguration::GAME_MODE);
+	GraphicalInterface::InterfaceSelector game_round = GraphicalInterface::get_selector(GraphicalInterface::InterfaceConfiguration::GAME_ROUND);
 	
-	// if (game_round == GraphicalInterface::InterfaceSelector::SELECTOR_ROUND_SKILL) {
+	if (game_round == GraphicalInterface::InterfaceSelector::SELECTOR_ROUND_SKILL) {
 
-	// 	return;
-	// }
+		return;
+	}
 
-	// // team
-	// bool position_offset = game_team == GraphicalInterface::InterfaceSelector::SELECTOR_TEAM_RED;
+	// team
+	bool position_offset = game_team == GraphicalInterface::InterfaceSelector::SELECTOR_TEAM_RED;
 	
-	// // fist position scoring mode
-	// if      (position == GraphicalInterface::InterfaceSelector::SELECTOR_POSITION_1 &&
-	// 	     mode == GraphicalInterface::InterfaceSelector::SELECTOR_MODE_SCORE) {
-	// 	// AutonFirstScoring auton = AutonFirstScoring(&chassis, &cata, &intake, &roller, position_offset);
-	// 	// auton.run();
-	// 	printf("#1 score, offset %d\n", position_offset);
-	// }
-	// // second position scoring mode
-	// else if (position == GraphicalInterface::InterfaceSelector::SELECTOR_POSITION_2 &&
-	// 	     mode == GraphicalInterface::InterfaceSelector::SELECTOR_MODE_SCORE) {
-	// 	// AutonSecondScoring auton = AutonSecondScoring(&chassis, &cata, &intake, &roller, position_offset);
-	// 	// auton.run();
-	// 	printf("#2 score, offset %d\n", position_offset);
-	// }
-	// // fist position support mode (WP)
-	// else if (position == GraphicalInterface::InterfaceSelector::SELECTOR_POSITION_1 &&
-	// 	     mode == GraphicalInterface::InterfaceSelector::SELECTOR_MODE_SUPPORT) {
-	// 	// AutonFirstSupport auton = AutonFirstSupport(&chassis, &cata, &intake, &roller, position_offset);
-	// 	// auton.run();
-	// 	printf("#1 support, offset %d\n", position_offset);
-	// }
-	// // idle mode
-	// else if (mode == GraphicalInterface::InterfaceSelector::SELECTOR_MODE_IDLE) {
-	// 	printf("idle\n");
-	// 	;
-	// }
-
-	bool position_offset = true;
-	AutonFirstScoring auton = AutonFirstScoring(&core, cata, position_offset);
-	auton.run();
+	// fist position scoring mode
+	if      (position == GraphicalInterface::InterfaceSelector::SELECTOR_POSITION_1 &&
+		     mode == GraphicalInterface::InterfaceSelector::SELECTOR_MODE_SCORE) {
+		AutonFirstScoring auton = AutonFirstScoring(&core, cata, position_offset);
+		auton.run();
+		printf("#1 score, offset %d\n", position_offset);
+	}
+	// second position scoring mode
+	else if (position == GraphicalInterface::InterfaceSelector::SELECTOR_POSITION_2 &&
+		     mode == GraphicalInterface::InterfaceSelector::SELECTOR_MODE_SCORE) {
+		AutonSecondScoring auton = AutonSecondScoring(&core, cata, position_offset);
+		auton.run();
+		printf("#2 score, offset %d\n", position_offset);
+	}
+	// fist position support mode (WP)
+	else if (position == GraphicalInterface::InterfaceSelector::SELECTOR_POSITION_1 &&
+		     mode == GraphicalInterface::InterfaceSelector::SELECTOR_MODE_SUPPORT) {
+		AutonFirstSupport auton = AutonFirstSupport(&core, cata, position_offset);
+		auton.run();
+		printf("#1 support, offset %d\n", position_offset);
+	}
+	// idle mode
+	else if (mode == GraphicalInterface::InterfaceSelector::SELECTOR_MODE_IDLE) {
+		printf("idle\n");
+		;
+	}
 }
 
 /**
@@ -168,31 +166,32 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-    std::shared_ptr<Odom> odometry = std::make_shared<Odom>(&core, OdomMode::MIDDLETW_IMU);
-    Chassis chassis = Chassis(&core, odometry);
+    Chassis chassis = Chassis(&core);
     Intake intake = Intake(&core);
     Roller roller = Roller(&core);
+	Expansion expansion = Expansion(&core);
+	Blocker blocker = Blocker(&core);
 
-	// cata.reset();
-	// odometry.reset();
-	// chassis.reset();
-	// intake_obj.reset();
-	// roller_obj.reset();
-	// cata->reset();
 
 	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
 	printf("finish setbreakmode\n");
 	bool is_boosting = false;
 	bool boost_button_state = false;
+
+	bool is_blocking = false;
+	bool blocker_button_state_master  = false;
+	bool blocker_button_state_partner = false;
 	
 
 	while (true) {
 		// locomotion
-		chassis.cheezyDrive(core.controller->getAnalog(Configuration::Controls::FORWARD_AXIS), core.controller->getAnalog(Configuration::Controls::TURN_AXIS));
+		chassis.cheezyDrive(core.controller->getAnalog(Configuration::Controls::FORWARD_AXIS), 0.8*core.controller->getAnalog(Configuration::Controls::TURN_AXIS));
 		
 		// intake & roller
 		if (core.controller->getDigital(Configuration::Controls::INTAKE_BUTTON)) {
 			intake.turn_on();
+		} else if (core.controller->getDigital(Configuration::Controls::INTAKE_REV_BUTTON)) {
+			intake.turn_on_rev();
 		} else {
 			intake.turn_off();
 		}
@@ -202,19 +201,49 @@ void opcontrol() {
 			is_boosting = true;
 			boost_button_state = true;
 			cata->set_boost(true);
+			core.controller->setText(0,0,"BOOST ");
 		} else if (!boost_button_state && core.controller->getDigital(Configuration::Controls::BOOST_BUTTON) && is_boosting) {
 			is_boosting = false;
 			boost_button_state = true;
 			cata->set_boost(false);
+			core.controller->setText(0,0,"NORMAL");
 		} else if (!core.controller->getDigital(Configuration::Controls::BOOST_BUTTON)) {
 			boost_button_state = false;
 		}
 		
-
-
+		// shoot
 		if (core.controller->getDigital(Configuration::Controls::SHOOT_BUTTON)) {
 			cata->fire();
 		}
+
+		// blocker (master)
+		if (!blocker_button_state_master && core.controller->getDigital(Configuration::Controls::BLOCKER_BUTTON) && !is_blocking) {
+			is_blocking = true;
+			blocker_button_state_master = true;
+		} else if (!blocker_button_state_master && core.controller->getDigital(Configuration::Controls::BLOCKER_BUTTON) && is_blocking) {
+			is_blocking = false;
+			blocker_button_state_master = true;
+		} else if (!core.controller->getDigital(Configuration::Controls::BLOCKER_BUTTON)) {
+			blocker_button_state_master = false;
+		}
+
+		// blocker (partner)
+		if (!blocker_button_state_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_BUTTON) && !is_blocking) {
+			is_blocking = true;
+			blocker_button_state_partner = true;
+		} else if (!blocker_button_state_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_BUTTON) && is_blocking) {
+			is_blocking = false;
+			blocker_button_state_partner = true;
+		} else if (!core.partner->getDigital(Configuration::Controls::BLOCKER_BUTTON)) {
+			blocker_button_state_partner = false;
+		}
+
+
+		// expansion
+		if (core.partner->getDigital(Configuration::Controls::EXPANSION_BUTTON)) {
+			expansion.deploy();
+		}
+
 		pros::delay(20);
 	}
 }

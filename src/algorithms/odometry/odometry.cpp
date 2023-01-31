@@ -337,6 +337,7 @@ void Odom::position_tracking() {
         this->position.x_pct   = this->xPosGlobal / Constants::Field::FIELD_LENGTH * 100;
         this->position.y_pct   = this->yPosGlobal / Constants::Field::FIELD_LENGTH * 100;
         this->position.theta   = this->currentAbsoluteOrientation * 180 / M_PI;
+        // printf("%f %f %f\n", this->position.x_pct, this->position.y_pct, this->position.theta);
 
         pros::delay(10);
 

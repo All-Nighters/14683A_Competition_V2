@@ -19,7 +19,7 @@ namespace Constants {
 		inline float DISPLACEMENT_P = 300;
 		inline float DISPLACEMENT_I = 0.01;
 		inline float DISPLACEMENT_D = 500;
-		inline float ROTATION_P = 400;
+		inline float ROTATION_P = 200;
 		inline float ROTATION_I = 0.1;
 		inline float ROTATION_D = 250;
 	}

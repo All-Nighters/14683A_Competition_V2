@@ -113,7 +113,8 @@ struct Core {
 	okapi::Motor*        roller;
 	okapi::Motor*        catapult_motor;
 	pros::ADIDigitalOut* piston_booster;
-	pros::ADIDigitalOut* expansion;
+	pros::ADIDigitalOut* expansion_left;
+	pros::ADIDigitalOut* expansion_right;
 	pros::ADIDigitalOut* blocker_left;
 	pros::ADIDigitalOut* blocker_right;
 	pros::ADIDigitalOut* blocker_top;

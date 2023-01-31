@@ -4,6 +4,7 @@ class PurePursuit {
     public:
         PurePursuit(float max_velocity = 300);
         PurePursuit(std::vector<Coordinates> input_path, float max_velocity = 300);
+        PurePursuit(float Tp, float Ti, float Td, float max_velocity = 300);
         bool is_arrived();
         void set_path(std::vector<Coordinates> input_path);
         ChassisVelocityPair step(RobotPosition position, bool reverse = false);
@@ -26,6 +27,7 @@ class PurePursuit {
         float total_rotation_error;
         std::vector<Coordinates> path;
         void init();
+        void init(float Tp, float Ti, float Td);
         void reset_error();
         int closest(RobotPosition position);
         Coordinates getLookAheadPoint(RobotPosition position);

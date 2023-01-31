@@ -6,6 +6,7 @@ class Chassis {
     public:
         Chassis(struct Core* core);
         Chassis(struct Core* core, std::shared_ptr<Odom> odom);
+        Chassis(struct Core* core, std::shared_ptr<Odom> odom, float pursuit_Tp, float pursuit_Ti, float pursuit_Td);
         ~Chassis();
         void setBrakeMode(AbstractMotor::brakeMode brake_mode);
 
@@ -19,9 +20,9 @@ class Chassis {
         void moveDistance(float pct, float max_voltage = 12000);
         void turnAngle(float angle);
         void faceAngle(float angle);
-        void faceCoordinate(float x, float y);
+        void faceCoordinate(float x, float y, float angle_offset = 0);
         void simpleMoveToPoint(float x, float y);
-        void simpleMoveToPointBackwards(float x, float y);
+        void simpleMoveToPointBackwards(float x, float y, float max_voltage = 5000);
 
         void followPath(std::vector<Coordinates> path, bool reverse = false);
 
@@ -44,7 +45,7 @@ class Chassis {
         // rotational PID constants
         float Rp = 70;
         float Ri = 0.01;
-        float Rd = 280;
+        float Rd = 260;
 
         // directional PID constants
         float Dp = 200;
