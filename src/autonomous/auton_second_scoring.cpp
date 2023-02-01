@@ -33,9 +33,9 @@ void AutonSecondScoring::run() {
 
     // start
     this->chassis_ptr->odom->setState(60.925925925925924, 90.55555555555556, -70.37755003019457);
-    pros::delay(1000);
+    pros::delay(1500);
     // shoot preload
-    this->catapult_ptr->fire(200);
+    this->catapult_ptr->fire(170);
     this->chassis_ptr->moveVelocity(399);
     pros::delay(500);
     this->chassis_ptr->moveVoltage(0);

@@ -51,7 +51,7 @@ void AutonFirstSupport::run() {
     // shoot 
     this->chassis_ptr->moveDistance(10);
     this->chassis_ptr->followPath(first_three_disk_path);
-    this->chassis_ptr->faceCoordinate(Constants::Field::BLUE_HIGH_GOAL_PCT[0], Constants::Field::BLUE_HIGH_GOAL_PCT[1]);
+    this->chassis_ptr->faceCoordinate(Constants::Field::BLUE_HIGH_GOAL_PCT[0], Constants::Field::BLUE_HIGH_GOAL_PCT[1], -3);
     pros::delay(500);
     this->catapult_ptr->fire();
     pros::delay(200);
@@ -62,7 +62,7 @@ void AutonFirstSupport::run() {
     this->intake_ptr->turn_on();
     this->chassis_ptr->followPath(last_three_disk_path, true);
     this->chassis_ptr->faceAngle(-90);
-    this->chassis_ptr->moveVelocity(-200);
+    this->chassis_ptr->moveVelocity(-100, -200);
     pros::delay(1500);
     this->chassis_ptr->moveVelocity(0);
     this->intake_ptr->turn_off();

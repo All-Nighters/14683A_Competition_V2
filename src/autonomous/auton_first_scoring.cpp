@@ -62,13 +62,16 @@ void AutonFirstScoring::run() {
     this->chassis_ptr->moveVelocity(0);
     this->chassis_ptr->faceAngle(-135);
     this->chassis_ptr->followPath(first_two_disk_path, true);
+    pros::delay(200);
     this->intake_ptr->turn_on();
     this->chassis_ptr->faceAngle(-135);
     this->chassis_ptr->moveDistance(-1);
-    pros::delay(500);
+    // pros::delay(500);
     this->chassis_ptr->setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
     this->chassis_ptr->faceCoordinate(Constants::Field::BLUE_HIGH_GOAL_PCT[0], Constants::Field::BLUE_HIGH_GOAL_PCT[1]);
-    this->chassis_ptr->moveDistance(1);
+    this->chassis_ptr->moveVoltage(4000);
+    pros::delay(500);
+    this->chassis_ptr->moveVoltage(0);
     this->chassis_ptr->faceCoordinate(Constants::Field::BLUE_HIGH_GOAL_PCT[0], Constants::Field::BLUE_HIGH_GOAL_PCT[1]);
     this->intake_ptr->turn_off();
     this->catapult_ptr->fire();
@@ -79,13 +82,16 @@ void AutonFirstScoring::run() {
     // shoot 2 disks
     this->intake_ptr->turn_on();
     this->chassis_ptr->simpleMoveToPointBackwards(31.814814814814813, 61.01851851851851);
+    this->chassis_ptr->moveVoltage(3000);
     pros::delay(600);
 
     this->chassis_ptr->followPath(last_middle_path, false);
     this->intake_ptr->turn_off();
-    this->chassis_ptr->faceCoordinate(Constants::Field::BLUE_HIGH_GOAL_PCT[0], Constants::Field::BLUE_HIGH_GOAL_PCT[1]);
+    this->chassis_ptr->faceCoordinate(Constants::Field::BLUE_HIGH_GOAL_PCT[0], Constants::Field::BLUE_HIGH_GOAL_PCT[1], -3);
     this->catapult_ptr->fire(450);
-    this->chassis_ptr->moveDistance(0.5);
+    this->chassis_ptr->moveVoltage(3000);
+    pros::delay(600);
+    this->chassis_ptr->moveVoltage(0);
     this->catapult_ptr->wait_until_reloaded();
     
 }
