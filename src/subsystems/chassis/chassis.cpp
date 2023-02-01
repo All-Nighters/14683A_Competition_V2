@@ -15,8 +15,13 @@ Chassis::Chassis(struct Core* core) {
     this->imu1 = core->imu_first;
     this->imu2 = core->imu_second;
     this->vision = std::move(std::make_unique<Vision>(core));
-    std::vector<pros::vision_signature_s_t> signatures;
-    this->vision->set_signatures(signatures);
+    // signatures
+    std::vector<pros::vision_signature_s_t> vision_signatures;
+    pros::vision_signature_s_t RED_SIG = pros::Vision::signature_from_utility(1, 4323, 9413, 6868, -745, 95, -325, 1.9, 0);
+    pros::vision_signature_s_t BLUE_SIG = pros::Vision::signature_from_utility(2, -2415, 1, -1207, 1815, 11549, 6682, 0.9, 0);
+    vision_signatures.push_back(RED_SIG);
+    vision_signatures.push_back(BLUE_SIG);
+    this->vision->set_signatures(vision_signatures);
     printf("Chassis created\n");
 }
 
@@ -483,7 +488,7 @@ void Chassis::auto_aim() {
 
     float current_rotation = (this->imu1->get_rotation() + this->imu2->get_rotation())/2.0;
     float target_angle = current_rotation + angle;
-    float prev_error = abs(angle);
+    float prev_error = angle;
     float total_error = 0;
 
     float error = target_angle - current_rotation;
@@ -494,5 +499,5 @@ void Chassis::auto_aim() {
 
     prev_error = error;
 
-    this->moveVoltage(control_output, -control_output);
+    this->moveVoltage(-control_output, control_output);
 }
