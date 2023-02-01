@@ -117,7 +117,8 @@ void autonomous() {
 	GraphicalInterface::InterfaceSelector game_round = GraphicalInterface::get_selector(GraphicalInterface::InterfaceConfiguration::GAME_ROUND);
 	
 	if (game_round == GraphicalInterface::InterfaceSelector::SELECTOR_ROUND_SKILL) {
-
+		Skill auton = Skill(&core, cata, false);
+		auton.run();
 		return;
 	}
 

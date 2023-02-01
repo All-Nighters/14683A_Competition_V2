@@ -11,5 +11,6 @@ class Skill {
         std::unique_ptr<Chassis> chassis_ptr;
         std::unique_ptr<Intake> intake_ptr;
         std::unique_ptr<Roller> roller_ptr;
+        std::unique_ptr<Expansion> expansion_ptr;
         bool offset;
 };
