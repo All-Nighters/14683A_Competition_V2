@@ -76,6 +76,7 @@ typedef struct ChassisVelocityPair {
 #include "autonomous/auton_first_scoring.h"
 #include "autonomous/auton_first_support.h"
 #include "autonomous/auton_second_scoring.h"
+#include "autonomous/skill.h"
 
 /**
  * If you find doing pros::Motor() to be tedious and you'd prefer just to do

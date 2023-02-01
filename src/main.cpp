@@ -151,7 +151,6 @@ void autonomous() {
 		;
 	}
 }
-
 /**
  * Runs the operator control code. This function will be started in its own task
  * with the default priority and stack size whenever the robot is enabled via
@@ -170,7 +169,6 @@ void opcontrol() {
     Intake intake = Intake(&core);
     Roller roller = Roller(&core);
 	Expansion expansion = Expansion(&core);
-	Blocker blocker = Blocker(&core);
 
 
 	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
@@ -178,9 +176,15 @@ void opcontrol() {
 	bool is_boosting = false;
 	bool boost_button_state = false;
 
-	bool is_blocking = false;
-	bool blocker_button_state_master  = false;
-	bool blocker_button_state_partner = false;
+	bool is_blocking_left = false;
+	bool is_blocking_right = false;
+	bool is_blocking_top = false;
+	bool is_blocking_all = false;
+
+	bool blocker_button_state_left_partner = false;
+	bool blocker_button_state_right_partner = false;
+	bool blocker_button_state_top_partner = false;
+	bool blocker_button_state_all_partner = false;
 	
 
 	while (true) {
@@ -216,32 +220,71 @@ void opcontrol() {
 			cata->fire();
 		}
 
-		// blocker (master)
-		if (!blocker_button_state_master && core.controller->getDigital(Configuration::Controls::BLOCKER_BUTTON) && !is_blocking) {
-			is_blocking = true;
-			blocker_button_state_master = true;
-		} else if (!blocker_button_state_master && core.controller->getDigital(Configuration::Controls::BLOCKER_BUTTON) && is_blocking) {
-			is_blocking = false;
-			blocker_button_state_master = true;
-		} else if (!core.controller->getDigital(Configuration::Controls::BLOCKER_BUTTON)) {
-			blocker_button_state_master = false;
-		}
+		// endgame
+		if (core.partner->getDigital(Configuration::Controls::SAFETY_BUTTON)) {
+			// left blocker (partner)
+			if (!blocker_button_state_left_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_LEFT_BUTTON) && !is_blocking_left) {
+				is_blocking_left = true;
+				blocker_button_state_left_partner = true;
+				core.blocker_left->set_value(true);
+			} else if (!blocker_button_state_left_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_LEFT_BUTTON) && is_blocking_left) {
+				is_blocking_left = false;
+				blocker_button_state_left_partner = true;
+				core.blocker_left->set_value(false);
+			} else if (!core.partner->getDigital(Configuration::Controls::BLOCKER_LEFT_BUTTON)) {
+				blocker_button_state_left_partner = false;
+			}
 
-		// blocker (partner)
-		if (!blocker_button_state_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_BUTTON) && !is_blocking) {
-			is_blocking = true;
-			blocker_button_state_partner = true;
-		} else if (!blocker_button_state_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_BUTTON) && is_blocking) {
-			is_blocking = false;
-			blocker_button_state_partner = true;
-		} else if (!core.partner->getDigital(Configuration::Controls::BLOCKER_BUTTON)) {
-			blocker_button_state_partner = false;
-		}
+			// right blocker (partner)
+			if (!blocker_button_state_right_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_RIGHT_BUTTON) && !is_blocking_right) {
+				is_blocking_right = true;
+				blocker_button_state_right_partner = true;
+				core.blocker_right->set_value(true);
+			} else if (!blocker_button_state_right_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_RIGHT_BUTTON) && is_blocking_right) {
+				is_blocking_right = false;
+				blocker_button_state_right_partner = true;
+				core.blocker_right->set_value(false);
+			} else if (!core.partner->getDigital(Configuration::Controls::BLOCKER_RIGHT_BUTTON)) {
+				blocker_button_state_right_partner = false;
+			}
 
+			// top blocker (partner)
+			if (!blocker_button_state_top_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_TOP_BUTTON) && !is_blocking_top) {
+				is_blocking_top = true;
+				blocker_button_state_top_partner = true;
+				core.blocker_top->set_value(true);
+			} else if (!blocker_button_state_top_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_TOP_BUTTON) && is_blocking_top) {
+				is_blocking_top = false;
+				blocker_button_state_top_partner = true;
+				core.blocker_top->set_value(false);
+			} else if (!core.partner->getDigital(Configuration::Controls::BLOCKER_TOP_BUTTON)) {
+				blocker_button_state_top_partner = false;
+			}
 
-		// expansion
-		if (core.partner->getDigital(Configuration::Controls::EXPANSION_BUTTON)) {
-			expansion.deploy();
+			// all blocker (partner)
+			if (!blocker_button_state_all_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON) && !is_blocking_all) {
+				is_blocking_all = true;
+				blocker_button_state_all_partner = true;
+				core.blocker_left->set_value(true);
+				core.blocker_right->set_value(true);
+				core.blocker_top->set_value(true);
+			} else if (!blocker_button_state_all_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON) && is_blocking_all) {
+				is_blocking_all = false;
+				blocker_button_state_all_partner = true;
+				core.blocker_left->set_value(false);
+				core.blocker_right->set_value(false);
+				core.blocker_top->set_value(false);
+			} else if (!core.partner->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON)) {
+				blocker_button_state_all_partner = false;
+			}
+
+			// expansion
+			if (core.partner->getDigital(Configuration::Controls::EXPANSION_LEFT_BUTTON)) {
+				core.expansion_left->set_value(true);
+			}
+			if (core.partner->getDigital(Configuration::Controls::EXPANSION_RIGHT_BUTTON)) {
+				core.expansion_right->set_value(true);
+			}
 		}
 
 		pros::delay(20);
