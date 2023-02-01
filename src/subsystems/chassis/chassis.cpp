@@ -473,8 +473,8 @@ void Chassis::cheezyDrive(float throttle, float turn) {
         turn = -this->exponential_filter(-turn);
     }
 
-    if (abs(turn) > 0.6) {
-        turn = turn > 0 ? 0.6 : -0.6;
+    if (abs(turn) > 0.5) {
+        turn = turn > 0 ? 0.5 : -0.5;
     }
 
     float t_left = throttle + turn;

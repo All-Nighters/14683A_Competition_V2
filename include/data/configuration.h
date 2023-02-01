@@ -26,31 +26,32 @@ namespace Configuration {
     namespace Digital {
         inline std::uint8_t     CATAPULT_LOAD_SENSOR = 'H';
         inline std::uint8_t     BOOSTER              = 'F';
-        inline std::uint8_t     EXPANSION_LEFT       = 'A';
-        inline std::uint8_t     EXPANSION_RIGHT      = 'C';
-        inline std::uint8_t     BLOCKER_RIGHT        = 'B';
-        inline std::uint8_t     BLOCKER_LEFT         = 'E';
+        inline std::uint8_t     EXPANSION_LEFT       = 'C';
+        inline std::uint8_t     EXPANSION_RIGHT      = 'A';
+        inline std::uint8_t     BLOCKER_RIGHT        = 'E';
+        inline std::uint8_t     BLOCKER_LEFT         = 'B';
         inline std::uint8_t     BLOCKER_TOP          = 'D';
 
         inline std::uint8_t     VISION_GOAL          = 13;
     }
 
     namespace Controls {
-        inline ControllerAnalog  FORWARD_AXIS            = ControllerAnalog::leftY;
-        inline ControllerAnalog  TURN_AXIS               = ControllerAnalog::rightX;
+        inline ControllerAnalog  FORWARD_AXIS                = ControllerAnalog::leftY;
+        inline ControllerAnalog  TURN_AXIS                   = ControllerAnalog::rightX;
 
-        inline ControllerDigital INTAKE_BUTTON           = ControllerDigital::R1;
-        inline ControllerDigital INTAKE_REV_BUTTON       = ControllerDigital::R2;
-        inline ControllerDigital SAFETY_BUTTON           = ControllerDigital::left;
+        inline ControllerDigital INTAKE_BUTTON               = ControllerDigital::R1;
+        inline ControllerDigital INTAKE_REV_BUTTON           = ControllerDigital::R2;
+        inline ControllerDigital SAFETY_BUTTON               = ControllerDigital::left;
 
-        inline ControllerDigital BOOST_BUTTON            = ControllerDigital::A;
-        inline ControllerDigital SHOOT_BUTTON            = ControllerDigital::L2;
-        inline ControllerDigital EXPANSION_LEFT_BUTTON   = ControllerDigital::L1;
-        inline ControllerDigital EXPANSION_RIGHT_BUTTON  = ControllerDigital::R1;
-        inline ControllerDigital BLOCKER_LEFT_BUTTON     = ControllerDigital::Y;
-        inline ControllerDigital BLOCKER_RIGHT_BUTTON    = ControllerDigital::A;
-        inline ControllerDigital BLOCKER_TOP_BUTTON      = ControllerDigital::X;
-        inline ControllerDigital BLOCKER_ALL_BUTTON      = ControllerDigital::B;
+        inline ControllerDigital BOOST_BUTTON               = ControllerDigital::A;
+        inline ControllerDigital SHOOT_BUTTON               = ControllerDigital::L2;
+        inline ControllerDigital EXPANSION_LEFT_BUTTON      = ControllerDigital::L1;
+        inline ControllerDigital EXPANSION_RIGHT_BUTTON     = ControllerDigital::R1;
+        inline ControllerDigital BLOCKER_LEFT_BUTTON        = ControllerDigital::Y;
+        inline ControllerDigital BLOCKER_RIGHT_BUTTON       = ControllerDigital::A;
+        inline ControllerDigital BLOCKER_TOP_BUTTON         = ControllerDigital::X;
+        inline ControllerDigital BLOCKER_ALL_BUTTON_PARTNER = ControllerDigital::B;
+        inline ControllerDigital BLOCKER_ALL_BUTTON_MASTER  = ControllerDigital::Y;
 
         
 

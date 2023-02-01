@@ -176,6 +176,7 @@ void opcontrol() {
 	printf("finish setbreakmode\n");
 	bool is_boosting = false;
 	bool boost_button_state = false;
+	core.controller->setText(0,0,"NORMAL");
 
 	bool is_blocking_left = false;
 	bool is_blocking_right = false;
@@ -186,11 +187,12 @@ void opcontrol() {
 	bool blocker_button_state_right_partner = false;
 	bool blocker_button_state_top_partner = false;
 	bool blocker_button_state_all_partner = false;
+	bool blocker_button_state_all_master = false;
 	
 
 	while (true) {
 		// locomotion
-		chassis.cheezyDrive(core.controller->getAnalog(Configuration::Controls::FORWARD_AXIS), 0.8*core.controller->getAnalog(Configuration::Controls::TURN_AXIS));
+		chassis.cheezyDrive(core.controller->getAnalog(Configuration::Controls::FORWARD_AXIS), 0.75*core.controller->getAnalog(Configuration::Controls::TURN_AXIS));
 		
 		// intake & roller
 		if (core.controller->getDigital(Configuration::Controls::INTAKE_BUTTON)) {
@@ -223,6 +225,7 @@ void opcontrol() {
 
 		// endgame
 		if (core.partner->getDigital(Configuration::Controls::SAFETY_BUTTON)) {
+			core.partner->setText(0,0,"SAFE OFF");
 			// left blocker (partner)
 			if (!blocker_button_state_left_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_LEFT_BUTTON) && !is_blocking_left) {
 				is_blocking_left = true;
@@ -262,20 +265,27 @@ void opcontrol() {
 				blocker_button_state_top_partner = false;
 			}
 
+
 			// all blocker (partner)
-			if (!blocker_button_state_all_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON) && !is_blocking_all) {
+			if (!blocker_button_state_all_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON_PARTNER) && !is_blocking_all) {
 				is_blocking_all = true;
+				is_blocking_left = true;
+				is_blocking_right = true;
+				is_blocking_top = true;
 				blocker_button_state_all_partner = true;
 				core.blocker_left->set_value(true);
 				core.blocker_right->set_value(true);
 				core.blocker_top->set_value(true);
-			} else if (!blocker_button_state_all_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON) && is_blocking_all) {
+			} else if (!blocker_button_state_all_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON_PARTNER) && is_blocking_all) {
 				is_blocking_all = false;
+				is_blocking_left = false;
+				is_blocking_right = false;
+				is_blocking_top = false;
 				blocker_button_state_all_partner = true;
 				core.blocker_left->set_value(false);
 				core.blocker_right->set_value(false);
 				core.blocker_top->set_value(false);
-			} else if (!core.partner->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON)) {
+			} else if (!core.partner->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON_PARTNER)) {
 				blocker_button_state_all_partner = false;
 			}
 
@@ -286,6 +296,31 @@ void opcontrol() {
 			if (core.partner->getDigital(Configuration::Controls::EXPANSION_RIGHT_BUTTON)) {
 				core.expansion_right->set_value(true);
 			}
+		} else {
+			core.partner->setText(0,0,"SAFE ON ");
+		}
+
+		// all blocker (master)
+		if (!blocker_button_state_all_master && core.controller->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON_MASTER) && !is_blocking_all) {
+			is_blocking_all = true;
+			is_blocking_left = true;
+			is_blocking_right = true;
+			is_blocking_top = true;
+			blocker_button_state_all_master = true;
+			core.blocker_left->set_value(true);
+			core.blocker_right->set_value(true);
+			core.blocker_top->set_value(true);
+		} else if (!blocker_button_state_all_master && core.controller->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON_MASTER) && is_blocking_all) {
+			is_blocking_all = false;
+			is_blocking_left = false;
+			is_blocking_right = false;
+			is_blocking_top = false;
+			blocker_button_state_all_master = true;
+			core.blocker_left->set_value(false);
+			core.blocker_right->set_value(false);
+			core.blocker_top->set_value(false);
+		} else if (!core.controller->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON_MASTER)) {
+			blocker_button_state_all_master = false;
 		}
 
 		pros::delay(20);

@@ -73,6 +73,7 @@ void Skill::run() {
     // start
     this->chassis_ptr->setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
     this->chassis_ptr->odom->setState(10.74074074074074, 25.833333333333332, 0);
+    pros::delay(200);
     
     /*
     First three disks

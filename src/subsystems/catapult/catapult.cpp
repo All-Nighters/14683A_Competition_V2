@@ -50,7 +50,6 @@ void Catapult::reposition() {
         pros::delay(20);
     }
     this->core->piston_booster->set_value(this->use_boost);
-    // printf("Loaded\n"); 
     this->core->catapult_motor->moveVoltage(0);
 }
 
