@@ -10,7 +10,7 @@ bool Catapult::continue_shooting = true;
  */
 Catapult::Catapult(struct Core* core) {
     this->triggered = false;
-    this->voltage = -9000;
+    this->voltage = -8700;
     this->fire_delay = 0;
     this->core = core;
     this->use_boost = false;
@@ -41,13 +41,12 @@ Catapult::~Catapult() {
  */
 void Catapult::reposition() {
     // rotate until it is loaded again
-    if (this->core->catapult_load_sensor->get_value() == 0) {
-        this->core->piston_booster->set_value(false);
-    }
     while (this->core->catapult_load_sensor->get_value() == 0) {
+        this->core->piston_booster->set_value(false);
         this->core->catapult_motor->moveVoltage(this->voltage);
-        pros::delay(20);
+        pros::delay(10);
     }
+
     this->core->piston_booster->set_value(this->use_boost);
     this->core->catapult_motor->moveVoltage(0);
 }
@@ -112,6 +111,7 @@ void Catapult::shooting_loop_trampoline(void* iparam) {
 void Catapult::shooting_loop() {
     Catapult::continue_shooting = true;
     while (Catapult::continue_shooting) {
+        this->core->piston_booster->set_value(this->use_boost);
         if (this->triggered) {
             if (this->fire_delay > 0) {
                 pros::delay(this->fire_delay);
@@ -136,6 +136,5 @@ void Catapult::reset() {
     this->shooting_task->remove();
     this->shooting_task.reset(nullptr);
     this->core->catapult_motor->moveVoltage(0);
-    this->core->piston_booster->set_value(false);
     this->shooting_task = std::move(std::make_unique<pros::Task>(this->shooting_loop_trampoline, this, "shooting loop"));
 }

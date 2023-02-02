@@ -190,6 +190,8 @@ void opcontrol() {
 	bool blocker_button_state_all_partner = false;
 	bool blocker_button_state_all_master = false;
 	
+	cata->set_boost(false);
+	
 
 	while (true) {
 		// locomotion
@@ -200,7 +202,7 @@ void opcontrol() {
 		}
 		
 		// intake & roller
-		if (core.controller->getDigital(Configuration::Controls::INTAKE_BUTTON) && cata->is_reloaded()) {
+		if (core.controller->getDigital(Configuration::Controls::INTAKE_BUTTON) && core.catapult_load_sensor->get_value() == 1) {
 			intake.turn_on();
 		} else if (core.controller->getDigital(Configuration::Controls::INTAKE_REV_BUTTON)) {
 			intake.turn_on_rev();

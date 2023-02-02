@@ -14,10 +14,10 @@ Intake::~Intake() {
     printf("intake destroyed\n");
 }
 void Intake::turn_on() {
-    this->core->intake->moveVoltage(-10000);
+    this->core->intake->moveVoltage(-8888);
 }
 void Intake::turn_on_rev() {
-    this->core->intake->moveVoltage(10000);
+    this->core->intake->moveVoltage(8888);
 }
 void Intake::turn_off() {
     this->core->intake->moveVoltage(0);
