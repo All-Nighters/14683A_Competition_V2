@@ -507,12 +507,12 @@ void Chassis::auto_aim() {
     total_error_autoaim += error;
     float deriv_error = error - prev_error;
 
-    float control_output = Math::clamp(error * 300 + total_error_autoaim * 3 + deriv_error * 300, -12000, 12000);
-    if (abs(control_output) < 2000) {
+    float control_output = Math::clamp(error * 500 + total_error_autoaim * 3 + deriv_error * 900, -12000, 12000);
+    if (abs(control_output) < 1000) {
         if (control_output < 0) {
-            control_output = -2000;
+            control_output = -1000;
         } else {
-            control_output = 2000;
+            control_output = 1000;
         }
     }
 
