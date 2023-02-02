@@ -86,7 +86,7 @@ void Skill::run() {
     */
     this->chassis_ptr->simpleMoveToPointBackwards(59.35185185185185, 10.648148148148147);
     this->chassis_ptr->faceAngle(-95);
-    this->chassis_ptr->followPath(second_three_disks_path, true)
+    this->chassis_ptr->followPath(second_three_disks_path, true);
     this->chassis_ptr->simpleMoveToPointBackwards(59.35185185185185, 10.648148148148147);
     this->chassis_ptr->faceCoordinate(Constants::Field::BLUE_HIGH_GOAL_PCT[0], Constants::Field::BLUE_HIGH_GOAL_PCT[1]);
     pros::delay(500);
@@ -97,7 +97,7 @@ void Skill::run() {
     */
     this->chassis_ptr->simpleMoveToPoint(57.22222222222222, 40.46296296296296);
     this->chassis_ptr->faceAngle(-175);
-    this->chassis_ptr->followPath(second_three_disks_path, true)
+    this->chassis_ptr->followPath(second_three_disks_path, true);
     this->chassis_ptr->simpleMoveToPoint(88.33333333333333, 42.03703703703704);
     this->chassis_ptr->faceCoordinate(Constants::Field::BLUE_HIGH_GOAL_PCT[0], Constants::Field::BLUE_HIGH_GOAL_PCT[1]);
     pros::delay(500);

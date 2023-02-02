@@ -58,6 +58,7 @@ class Chassis {
         bool odom_enabled;
         AbstractMotor::gearset motor_gearset;
         float maximum_velocity;
+        float total_error_autoaim;
 
         ADIEncoder* leftTW;
         ADIEncoder* rightTW;

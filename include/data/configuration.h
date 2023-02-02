@@ -43,15 +43,15 @@ namespace Configuration {
         inline ControllerDigital INTAKE_REV_BUTTON           = ControllerDigital::R2;
         inline ControllerDigital SAFETY_BUTTON               = ControllerDigital::left;
 
-        inline ControllerDigital BOOST_BUTTON               = ControllerDigital::A;
-        inline ControllerDigital SHOOT_BUTTON               = ControllerDigital::L2;
-        inline ControllerDigital EXPANSION_LEFT_BUTTON      = ControllerDigital::L1;
-        inline ControllerDigital EXPANSION_RIGHT_BUTTON     = ControllerDigital::R1;
-        inline ControllerDigital BLOCKER_LEFT_BUTTON        = ControllerDigital::Y;
-        inline ControllerDigital BLOCKER_RIGHT_BUTTON       = ControllerDigital::A;
-        inline ControllerDigital BLOCKER_TOP_BUTTON         = ControllerDigital::X;
-        inline ControllerDigital BLOCKER_ALL_BUTTON_PARTNER = ControllerDigital::B;
-        inline ControllerDigital BLOCKER_ALL_BUTTON_MASTER  = ControllerDigital::Y;
+        inline ControllerDigital AUTOAIM_BUTTON              = ControllerDigital::B;
+        inline ControllerDigital SHOOT_BUTTON                = ControllerDigital::L2;
+        inline ControllerDigital EXPANSION_LEFT_BUTTON       = ControllerDigital::L1;
+        inline ControllerDigital EXPANSION_RIGHT_BUTTON      = ControllerDigital::R1;
+        inline ControllerDigital BLOCKER_LEFT_BUTTON         = ControllerDigital::Y;
+        inline ControllerDigital BLOCKER_RIGHT_BUTTON        = ControllerDigital::A;
+        inline ControllerDigital BLOCKER_TOP_BUTTON          = ControllerDigital::X;
+        inline ControllerDigital BLOCKER_ALL_BUTTON_PARTNER  = ControllerDigital::B;
+        inline ControllerDigital BLOCKER_ALL_BUTTON_MASTER   = ControllerDigital::Y;
 
         
 

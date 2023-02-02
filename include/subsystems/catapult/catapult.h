@@ -7,6 +7,7 @@ class Catapult {
         void set_boost(bool use_boost);
         void fire(int fire_delay = 0);
         void wait_until_reloaded();
+        bool is_reloaded();
         static bool continue_shooting;
     private:
         bool use_boost;

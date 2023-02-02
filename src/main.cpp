@@ -174,9 +174,10 @@ void opcontrol() {
 
 	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
 	printf("finish setbreakmode\n");
+
+
 	bool is_boosting = false;
 	bool boost_button_state = false;
-	core.controller->setText(0,0,"NORMAL");
 
 	bool is_blocking_left = false;
 	bool is_blocking_right = false;
@@ -192,10 +193,14 @@ void opcontrol() {
 
 	while (true) {
 		// locomotion
-		chassis.cheezyDrive(core.controller->getAnalog(Configuration::Controls::FORWARD_AXIS), 0.75*core.controller->getAnalog(Configuration::Controls::TURN_AXIS));
+		if (core.controller->getDigital(Configuration::Controls::AUTOAIM_BUTTON)) {
+			chassis.auto_aim();
+		} else {
+			chassis.cheezyDrive(core.controller->getAnalog(Configuration::Controls::FORWARD_AXIS), 0.75*core.controller->getAnalog(Configuration::Controls::TURN_AXIS));
+		}
 		
 		// intake & roller
-		if (core.controller->getDigital(Configuration::Controls::INTAKE_BUTTON)) {
+		if (core.controller->getDigital(Configuration::Controls::INTAKE_BUTTON) && cata->is_reloaded()) {
 			intake.turn_on();
 		} else if (core.controller->getDigital(Configuration::Controls::INTAKE_REV_BUTTON)) {
 			intake.turn_on_rev();
@@ -203,21 +208,6 @@ void opcontrol() {
 			intake.turn_off();
 		}
 
-		// booster
-		if (!boost_button_state && core.controller->getDigital(Configuration::Controls::BOOST_BUTTON) && !is_boosting) {
-			is_boosting = true;
-			boost_button_state = true;
-			cata->set_boost(true);
-			core.controller->setText(0,0,"BOOST ");
-		} else if (!boost_button_state && core.controller->getDigital(Configuration::Controls::BOOST_BUTTON) && is_boosting) {
-			is_boosting = false;
-			boost_button_state = true;
-			cata->set_boost(false);
-			core.controller->setText(0,0,"NORMAL");
-		} else if (!core.controller->getDigital(Configuration::Controls::BOOST_BUTTON)) {
-			boost_button_state = false;
-		}
-		
 		// shoot
 		if (core.controller->getDigital(Configuration::Controls::SHOOT_BUTTON)) {
 			cata->fire();
@@ -265,6 +255,13 @@ void opcontrol() {
 				blocker_button_state_top_partner = false;
 			}
 
+			// check is blocking all
+			if (is_blocking_left && is_blocking_right && is_blocking_top) {
+				is_blocking_all = true;
+			} else {
+				is_blocking_all = false;
+			}
+
 
 			// all blocker (partner)
 			if (!blocker_button_state_all_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON_PARTNER) && !is_blocking_all) {
@@ -301,7 +298,7 @@ void opcontrol() {
 		}
 
 		// all blocker (master)
-		if (!blocker_button_state_all_master && core.controller->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON_MASTER) && !is_blocking_all) {
+		if (!blocker_button_state_all_master && core.controller->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON_MASTER) && (!is_blocking_left && !is_blocking_right && !is_blocking_top)) {
 			is_blocking_all = true;
 			is_blocking_left = true;
 			is_blocking_right = true;
@@ -310,7 +307,7 @@ void opcontrol() {
 			core.blocker_left->set_value(true);
 			core.blocker_right->set_value(true);
 			core.blocker_top->set_value(true);
-		} else if (!blocker_button_state_all_master && core.controller->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON_MASTER) && is_blocking_all) {
+		} else if (!blocker_button_state_all_master && core.controller->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON_MASTER) && !(!is_blocking_left && !is_blocking_right && !is_blocking_top)) {
 			is_blocking_all = false;
 			is_blocking_left = false;
 			is_blocking_right = false;

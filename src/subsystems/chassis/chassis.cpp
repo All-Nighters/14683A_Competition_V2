@@ -212,8 +212,11 @@ void Chassis::moveDistance(float pct, float max_voltage) {
             control_output = prev_control_output + direction * 400;
         }
 
-        float control_output_Left  = std::fmax(std::fmin(control_output, max_voltage), -max_voltage) + std::fmax(std::fmin(control_output_facing, max_voltage * 0.25), -max_voltage * 0.25);
-        float control_output_Right = std::fmax(std::fmin(control_output, max_voltage), -max_voltage) - std::fmax(std::fmin(control_output_facing, max_voltage * 0.25), -max_voltage * 0.25);
+        float control_output_Left  = std::fmax(std::fmin(control_output, max_voltage), -max_voltage) 
+        + std::fmax(std::fmin(control_output_facing, max_voltage * 0.25), -max_voltage * 0.25);
+        float control_output_Right = std::fmax(std::fmin(control_output, max_voltage), -max_voltage) 
+        - std::fmax(std::fmin(control_output_facing, max_voltage * 0.25), -max_voltage * 0.25);
+
         if (abs(control_output_Left) < 3000) {
             control_output_Left = direction * 3000;
         }
@@ -499,15 +502,23 @@ void Chassis::auto_aim() {
     float current_rotation = (this->imu1->get_rotation() + this->imu2->get_rotation())/2.0;
     float target_angle = current_rotation + angle;
     float prev_error = angle;
-    float total_error = 0;
 
     float error = target_angle - current_rotation;
-    total_error += error;
+    total_error_autoaim += error;
     float deriv_error = error - prev_error;
 
-    float control_output = Math::clamp(error * this->Rp + total_error * this->Ri + deriv_error * this->Rd, -12000, 12000);
+    float control_output = Math::clamp(error * 300 + total_error_autoaim * 3 + deriv_error * 300, -12000, 12000);
+    if (abs(control_output) < 2000) {
+        if (control_output < 0) {
+            control_output = -2000;
+        } else {
+            control_output = 2000;
+        }
+    }
+
+    printf("%f\n", angle);
 
     prev_error = error;
 
-    this->moveVoltage(-control_output, control_output);
+    this->moveVoltage(control_output, -control_output);
 }
