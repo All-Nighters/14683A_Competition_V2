@@ -8,4 +8,6 @@ class Intake {
         void turn_off();
     private:
         struct Core* core;
+        std::shared_ptr<Catapult> cata;
+        bool is_enabled;
 };

@@ -10,11 +10,12 @@ bool Catapult::continue_shooting = true;
  */
 Catapult::Catapult(struct Core* core) {
     this->triggered = false;
-    this->voltage = -8700;
+    this->voltage = -12000;
     this->fire_delay = 0;
     this->core = core;
     this->use_boost = false;
 
+    // this->rotation_sensor = std::make_unique<pros::Task>();
     this->core->catapult_motor->setBrakeMode(okapi::AbstractMotor::brakeMode::hold);
     this->shooting_task = std::move(std::make_unique<pros::Task>(this->shooting_loop_trampoline, this, "shooting loop"));
     Catapult::continue_shooting = true;
@@ -34,6 +35,9 @@ Catapult::~Catapult() {
     printf("Catapult destroyed %d\n", continue_shooting);
 }
 
+void Catapult::set_voltage(int voltage) {
+    this->voltage = -voltage;
+}
 
 /**
  * @brief Reload the catapult to a charged position
@@ -46,6 +50,12 @@ void Catapult::reposition() {
         this->core->catapult_motor->moveVoltage(this->voltage);
         pros::delay(10);
     }
+
+    // this->rotation_sensor.reset_position();
+    // while (this->rotation_sensor->get_rotation() < 500) { // 100 centedegrees is 1 degree
+    //     this->core->catapult_motor->moveVoltage(this->voltage);
+    //     pros::delay(10);
+    // }
 
     this->core->piston_booster->set_value(this->use_boost);
     this->core->catapult_motor->moveVoltage(0);

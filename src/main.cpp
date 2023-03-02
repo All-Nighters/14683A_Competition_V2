@@ -7,6 +7,7 @@ struct Core core;
 // controller
 okapi::Controller   controller            = okapi::Controller(okapi::ControllerId::master);
 okapi::Controller   partner               = okapi::Controller(okapi::ControllerId::partner);
+
 // chassis
 okapi::Motor        chassis_left_front    = okapi::Motor(Configuration::Motors::CHASSIS_LEFT_FRONT);
 okapi::Motor        chassis_left_middle   = okapi::Motor(Configuration::Motors::CHASSIS_LEFT_MIDDLE);
@@ -176,21 +177,15 @@ void opcontrol() {
 	printf("finish setbreakmode\n");
 
 
-	bool is_boosting = false;
-	bool boost_button_state = false;
-
 	bool is_blocking_left = false;
 	bool is_blocking_right = false;
 	bool is_blocking_top = false;
-	bool is_blocking_all = false;
 
-	bool blocker_button_state_left_partner = false;
-	bool blocker_button_state_right_partner = false;
-	bool blocker_button_state_top_partner = false;
-	bool blocker_button_state_all_partner = false;
-	bool blocker_button_state_all_master = false;
+	bool blocker_button_state_left = false;
+	bool blocker_button_state_right = false;
 	
 	cata->set_boost(false);
+	cata->set_voltage(9000);
 	
 
 	while (true) {
@@ -202,7 +197,7 @@ void opcontrol() {
 		}
 		
 		// intake & roller
-		if (core.controller->getDigital(Configuration::Controls::INTAKE_BUTTON) && core.catapult_load_sensor->get_value() == 1) {
+		if (core.controller->getDigital(Configuration::Controls::INTAKE_BUTTON)) {
 			intake.turn_on();
 		} else if (core.controller->getDigital(Configuration::Controls::INTAKE_REV_BUTTON)) {
 			intake.turn_on_rev();
@@ -215,112 +210,64 @@ void opcontrol() {
 			cata->fire();
 		}
 
-		// endgame
+		/*
+		Endgame
+		*/
+
+		// left blocker
+		if (!blocker_button_state_left && core.controller->getDigital(Configuration::Controls::BLOCKER_LEFT_BUTTON) && !is_blocking_left) {
+			is_blocking_left = true;
+			blocker_button_state_left = true;
+			core.blocker_left->set_value(true);
+		} else if (!blocker_button_state_left && core.controller->getDigital(Configuration::Controls::BLOCKER_LEFT_BUTTON) && is_blocking_left) {
+			is_blocking_left = false;
+			blocker_button_state_left = true;
+			core.blocker_left->set_value(false);
+		} else if (!core.controller->getDigital(Configuration::Controls::BLOCKER_LEFT_BUTTON)) {
+			blocker_button_state_left = false;
+		}
+
+		// right blocker
+		if (!blocker_button_state_right && core.controller->getDigital(Configuration::Controls::BLOCKER_RIGHT_BUTTON) && !is_blocking_right) {
+			is_blocking_right = true;
+			blocker_button_state_right = true;
+			core.blocker_right->set_value(true);
+		} else if (!blocker_button_state_right && core.controller->getDigital(Configuration::Controls::BLOCKER_RIGHT_BUTTON) && is_blocking_right) {
+			is_blocking_right = false;
+			blocker_button_state_right = true;
+			core.blocker_right->set_value(false);
+		} else if (!core.controller->getDigital(Configuration::Controls::BLOCKER_RIGHT_BUTTON)) {
+			blocker_button_state_right = false;
+		}
+
+		// top blocker
+		if (core.controller->getDigital(Configuration::Controls::BLOCKER_TOP_BUTTON_MASTER)) {
+			is_blocking_top = true;
+			core.blocker_top->set_value(true);
+		}
+
 		if (core.partner->getDigital(Configuration::Controls::SAFETY_BUTTON)) {
 			core.partner->setText(0,0,"SAFE OFF");
-			// left blocker (partner)
-			if (!blocker_button_state_left_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_LEFT_BUTTON) && !is_blocking_left) {
-				is_blocking_left = true;
-				blocker_button_state_left_partner = true;
-				core.blocker_left->set_value(true);
-			} else if (!blocker_button_state_left_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_LEFT_BUTTON) && is_blocking_left) {
-				is_blocking_left = false;
-				blocker_button_state_left_partner = true;
-				core.blocker_left->set_value(false);
-			} else if (!core.partner->getDigital(Configuration::Controls::BLOCKER_LEFT_BUTTON)) {
-				blocker_button_state_left_partner = false;
-			}
-
-			// right blocker (partner)
-			if (!blocker_button_state_right_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_RIGHT_BUTTON) && !is_blocking_right) {
-				is_blocking_right = true;
-				blocker_button_state_right_partner = true;
-				core.blocker_right->set_value(true);
-			} else if (!blocker_button_state_right_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_RIGHT_BUTTON) && is_blocking_right) {
-				is_blocking_right = false;
-				blocker_button_state_right_partner = true;
-				core.blocker_right->set_value(false);
-			} else if (!core.partner->getDigital(Configuration::Controls::BLOCKER_RIGHT_BUTTON)) {
-				blocker_button_state_right_partner = false;
-			}
-
-			// top blocker (partner)
-			if (!blocker_button_state_top_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_TOP_BUTTON) && !is_blocking_top) {
+			if (core.partner->getDigital(Configuration::Controls::BLOCKER_TOP_BUTTON_PARTNER)) {
 				is_blocking_top = true;
-				blocker_button_state_top_partner = true;
 				core.blocker_top->set_value(true);
-			} else if (!blocker_button_state_top_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_TOP_BUTTON) && is_blocking_top) {
-				is_blocking_top = false;
-				blocker_button_state_top_partner = true;
-				core.blocker_top->set_value(false);
-			} else if (!core.partner->getDigital(Configuration::Controls::BLOCKER_TOP_BUTTON)) {
-				blocker_button_state_top_partner = false;
-			}
-
-			// check is blocking all
-			if (is_blocking_left && is_blocking_right && is_blocking_top) {
-				is_blocking_all = true;
-			} else {
-				is_blocking_all = false;
-			}
-
-
-			// all blocker (partner)
-			if (!blocker_button_state_all_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON_PARTNER) && !is_blocking_all) {
-				is_blocking_all = true;
-				is_blocking_left = true;
-				is_blocking_right = true;
-				is_blocking_top = true;
-				blocker_button_state_all_partner = true;
-				core.blocker_left->set_value(true);
-				core.blocker_right->set_value(true);
-				core.blocker_top->set_value(true);
-			} else if (!blocker_button_state_all_partner && core.partner->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON_PARTNER) && is_blocking_all) {
-				is_blocking_all = false;
-				is_blocking_left = false;
-				is_blocking_right = false;
-				is_blocking_top = false;
-				blocker_button_state_all_partner = true;
-				core.blocker_left->set_value(false);
-				core.blocker_right->set_value(false);
-				core.blocker_top->set_value(false);
-			} else if (!core.partner->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON_PARTNER)) {
-				blocker_button_state_all_partner = false;
-			}
-
-			// expansion
-			if (core.partner->getDigital(Configuration::Controls::EXPANSION_LEFT_BUTTON)) {
-				core.expansion_left->set_value(true);
-			}
-			if (core.partner->getDigital(Configuration::Controls::EXPANSION_RIGHT_BUTTON)) {
-				core.expansion_right->set_value(true);
 			}
 		} else {
 			core.partner->setText(0,0,"SAFE ON ");
 		}
 
-		// all blocker (master)
-		if (!blocker_button_state_all_master && core.controller->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON_MASTER) && (!is_blocking_left && !is_blocking_right && !is_blocking_top)) {
-			is_blocking_all = true;
-			is_blocking_left = true;
-			is_blocking_right = true;
-			is_blocking_top = true;
-			blocker_button_state_all_master = true;
-			core.blocker_left->set_value(true);
-			core.blocker_right->set_value(true);
-			core.blocker_top->set_value(true);
-		} else if (!blocker_button_state_all_master && core.controller->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON_MASTER) && !(!is_blocking_left && !is_blocking_right && !is_blocking_top)) {
-			is_blocking_all = false;
-			is_blocking_left = false;
-			is_blocking_right = false;
-			is_blocking_top = false;
-			blocker_button_state_all_master = true;
-			core.blocker_left->set_value(false);
-			core.blocker_right->set_value(false);
-			core.blocker_top->set_value(false);
-		} else if (!core.controller->getDigital(Configuration::Controls::BLOCKER_ALL_BUTTON_MASTER)) {
-			blocker_button_state_all_master = false;
+		// expansion
+		if (core.controller->getDigital(Configuration::Controls::EXPANSION_LEFT_BUTTON)) {
+			core.expansion_left->set_value(true);
 		}
+		if (core.controller->getDigital(Configuration::Controls::EXPANSION_RIGHT_BUTTON)) {
+			core.expansion_right->set_value(true);
+		}
+		if (core.controller->getDigital(Configuration::Controls::EXPANSION_ALL_BUTTON)) {
+			core.expansion_left->set_value(true);
+			core.expansion_right->set_value(true);
+		}
+
 
 		pros::delay(20);
 	}

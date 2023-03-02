@@ -22,7 +22,7 @@ class Chassis {
         void faceAngle(float angle);
         void faceCoordinate(float x, float y, float angle_offset = 0);
         void simpleMoveToPoint(float x, float y);
-        void simpleMoveToPointBackwards(float x, float y, float max_voltage = 5000);
+        void simpleMoveToPointBackwards(float x, float y, float max_voltage = 5000, bool turn_on_intake = false);
 
         void followPath(std::vector<Coordinates> path, bool reverse = false);
 
@@ -34,6 +34,8 @@ class Chassis {
         // driver control functions
         float skim(float v);
         void cheezyDrive(float throttle, float turn);
+        void arcade(float throttle, float turn);
+        void tank(float left, float right);
         void auto_aim();
         std::shared_ptr<Odom> odom;
     private:

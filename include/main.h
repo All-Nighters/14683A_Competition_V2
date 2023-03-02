@@ -62,12 +62,12 @@ typedef struct ChassisVelocityPair {
 #include "algorithms/catmull_rom/catmull_rom.h"
 
 // subsystems
+#include "subsystems/catapult/catapult.h"
 #include "subsystems/vision/vision.h"
 #include "subsystems/chassis/chassis.h"
 #include "subsystems/intake/intake.h"
 #include "subsystems/roller/roller.h"
 #include "subsystems/optical/optical.h"
-#include "subsystems/catapult/catapult.h"
 #include "subsystems/expansion/expansion.h"
 #include "subsystems/blocker/blocker.h"
 #include "../src/subsystems/graphical_interface/graphical_interface.h"

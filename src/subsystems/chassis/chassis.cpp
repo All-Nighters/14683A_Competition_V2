@@ -379,7 +379,7 @@ void Chassis::simpleMoveToPoint(float xPercent, float yPercent) {
  * @param xPercent x coordinate of the target
  * @param yPercent y coordinate of the target
  */
-void Chassis::simpleMoveToPointBackwards(float xPercent, float yPercent, float max_voltage) {
+void Chassis::simpleMoveToPointBackwards(float xPercent, float yPercent, float max_voltage, bool turn_on_intake) {
     RobotPosition position = this->odom->getState();
     float xDist = xPercent - position.x_pct;
     float yDist = yPercent - position.y_pct;
@@ -390,7 +390,13 @@ void Chassis::simpleMoveToPointBackwards(float xPercent, float yPercent, float m
     xDist = xPercent - position.x_pct;
     yDist = yPercent - position.y_pct;
     dist = sqrt(xDist*xDist + yDist*yDist);
+    if (turn_on_intake && this->core->catapult_load_sensor->get_value() == 1) {
+        this->core->intake->moveVoltage(-10000);
+    }
     this->moveDistance(-dist, max_voltage);
+    if (turn_on_intake) {
+        this->core->intake->moveVoltage(0);
+    }
     
 
 }
@@ -488,6 +494,28 @@ void Chassis::cheezyDrive(float throttle, float turn) {
             Math::clamp(right * this->maximum_velocity, -this->maximum_velocity, this->maximum_velocity)
         );
     } 
+}
+
+/**
+ * @brief Arcade driver control
+ * 
+ * @param throttle forward power (-1 to 1)
+ * @param turn turn power (-1 to 1)
+ */
+void Chassis::arcade(float throttle, float turn) {
+    float left = this->maximum_velocity * (throttle + turn);
+    float right = this->maximum_velocity * (throttle - turn);
+    this->moveVelocity(left, right);
+}
+
+/**
+ * @brief Tank driver control
+ * 
+ * @param left left power (-1 to 1)
+ * @param right right power (-1 to 1)
+ */
+void Chassis::tank(float left, float right) {
+    this->moveVelocity(this->maximum_velocity * left, this->maximum_velocity * right);
 }
 
 void Chassis::auto_aim() {

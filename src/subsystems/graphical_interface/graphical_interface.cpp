@@ -65,7 +65,7 @@ void GraphicalInterface::interface_menu() {
     // selector sidebar 1
     lv_obj_t* selector_sidebar            = this->container_initialize(selector_container, GraphicalInterface::InterfaceType::SELECTOR_SIDEBAR_CONTAINER);
     lv_obj_t* selector_sidebar_autonomous = this->button_initialize(   selector_sidebar,   "Autonomous",  GraphicalInterface::InterfaceType::SELECTOR_SIDEBAR_BUTTON_1, GraphicalInterface::InterfaceAction::SELECTOR_AUTONOMOUS);
-    lv_obj_t* selector_sidebar_skill      = this->button_initialize(   selector_sidebar,   "Skill",       GraphicalInterface::InterfaceType::SELECTOR_SIDEBAR_BUTTON_1, GraphicalInterface::InterfaceAction::SELECTOR_SKILL);
+    lv_obj_t* selector_sidebar_skill      = this->button_initialize(   selector_sidebar,   "66799A",       GraphicalInterface::InterfaceType::SELECTOR_SIDEBAR_BUTTON_1, GraphicalInterface::InterfaceAction::SELECTOR_SKILL);
     this->object_scale(selector_sidebar,            150, (HEIGHT - 100), 0, 0);
     this->object_scale(selector_sidebar_autonomous, 140, 50,             5, 5);
     this->object_scale(selector_sidebar_skill,      140, 50,             5, 60);
@@ -324,7 +324,7 @@ void GraphicalInterface::interface_rerender() {
         std::vector<GraphicalInterface::InterfaceComponent> selector_description_objects = GraphicalInterface::get_children_by_type(GraphicalInterface::InterfaceType::SELECTOR_BODY_LABEL);
         static std::map<GraphicalInterface::InterfaceSelector, char*> configuration_display = {
             {GraphicalInterface::InterfaceSelector::SELECTOR_ROUND_AUTONOMOUS, "Autonomous"},
-            {GraphicalInterface::InterfaceSelector::SELECTOR_ROUND_SKILL,      "Skill"},
+            {GraphicalInterface::InterfaceSelector::SELECTOR_ROUND_SKILL,      "66799A"},
             {GraphicalInterface::InterfaceSelector::SELECTOR_MODE_SCORE,       "Score"},
             {GraphicalInterface::InterfaceSelector::SELECTOR_MODE_SUPPORT,     "Support"},
             {GraphicalInterface::InterfaceSelector::SELECTOR_MODE_IDLE,        "Idle"},

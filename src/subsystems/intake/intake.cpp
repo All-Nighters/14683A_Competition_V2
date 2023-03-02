@@ -14,10 +14,14 @@ Intake::~Intake() {
     printf("intake destroyed\n");
 }
 void Intake::turn_on() {
-    this->core->intake->moveVoltage(-8888);
+    if (this->core->catapult_load_sensor->get_value() == 1) {
+        this->core->intake->moveVoltage(-10000);
+    } else {
+        this->core->intake->moveVoltage(-10000);
+    }
 }
 void Intake::turn_on_rev() {
-    this->core->intake->moveVoltage(8888);
+    this->core->intake->moveVoltage(10000);
 }
 void Intake::turn_off() {
     this->core->intake->moveVoltage(0);

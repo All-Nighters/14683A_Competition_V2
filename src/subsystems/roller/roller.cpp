@@ -17,10 +17,10 @@ Roller::~Roller() {
 void Roller::rollto(RollerDirection direction) {
     switch (direction) {
         case RollerDirection::BACKWARD:
-            this->core->roller->moveVoltage(8000);
+            this->core->roller->moveVoltage(10000);
             break;
         case RollerDirection::FORWARD:
-            this->core->roller->moveVoltage(-8000);
+            this->core->roller->moveVoltage(-10000);
             break;
     }
 }

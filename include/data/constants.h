@@ -77,7 +77,7 @@ namespace Constants {
         inline AbstractMotor::gearset MOTOR_GEARSET = AbstractMotor::gearset::blue;
     }
 
-	inline pros::vision_signature_s_t RED_SIG = pros::Vision::signature_from_utility(1, 4323, 9413, 6868, -745, 95, -325, 1.9, 0);
-    inline pros::vision_signature_s_t BLUE_SIG = pros::Vision::signature_from_utility(2, -2841, -489, -1665, 2731, 13967, 8349, 1.300, 0);
+	inline pros::vision_signature_s_t RED_SIG = pros::Vision::signature_from_utility(1, 4379, 6553, 5466, -257, 431, 87, 2.400, 0);
+    inline pros::vision_signature_s_t BLUE_SIG = pros::Vision::signature_from_utility(2, -1821, -841, -1331, 6117, 9023, 7570, 3.400, 0);
 
 }
