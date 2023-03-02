@@ -503,8 +503,21 @@ void Chassis::cheezyDrive(float throttle, float turn) {
  * @param turn turn power (-1 to 1)
  */
 void Chassis::arcade(float throttle, float turn) {
-    float left = this->maximum_velocity * (throttle + turn);
-    float right = this->maximum_velocity * (throttle - turn);
+    // apply exponential filter on joystick values
+    if (throttle > 0) {
+        throttle = this->exponential_filter(throttle);
+    } else {
+        throttle = -this->exponential_filter(-throttle);
+    }
+
+    if (turn > 0) {
+        turn = this->exponential_filter(turn);
+    } else {
+        turn = -this->exponential_filter(-turn);
+    }
+    
+    float left = this->maximum_velocity * Math::clamp(throttle + turn, -1, 1);
+    float right = this->maximum_velocity * Math::clamp(throttle - turn, -1, 1);
     this->moveVelocity(left, right);
 }
 
@@ -515,6 +528,18 @@ void Chassis::arcade(float throttle, float turn) {
  * @param right right power (-1 to 1)
  */
 void Chassis::tank(float left, float right) {
+    // apply exponential filter on joystick values
+    if (left > 0) {
+        left = this->exponential_filter(left);
+    } else {
+        left = -this->exponential_filter(-left);
+    }
+
+    if (right > 0) {
+        right = this->exponential_filter(right);
+    } else {
+        right = -this->exponential_filter(-right);
+    }
     this->moveVelocity(this->maximum_velocity * left, this->maximum_velocity * right);
 }
 

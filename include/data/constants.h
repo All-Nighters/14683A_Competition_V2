@@ -73,7 +73,7 @@ namespace Constants {
         inline QLength TRACK_LENGTH                 = 27_cm;
         inline QLength MIDDLE_ENCODER_DISTANCE      = 12_cm;
         inline QLength TRACKING_WHEEL_DIAMETER      = 2.75_in;
-        inline float   EXTERNAL_GEAR_RATIO          = 1;
+        inline float   EXTERNAL_GEAR_RATIO          = 36.0/64.0*1.44;
         inline AbstractMotor::gearset MOTOR_GEARSET = AbstractMotor::gearset::blue;
     }
 
