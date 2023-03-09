@@ -1,14 +1,23 @@
-#include "algorithms/pure_pursuit/pure_pursuit.h"
+#include "algorithms/path_following/pursuit.h"
+#include "algorithms/path_following/pure_pursuit/pure_pursuit.h"
 
 using namespace okapi;
+
+enum class PursuitMode {
+    PID_PURE_PURSUIT,
+    CURVATURE_PURE_PURSUIT,
+    RAMSETE,
+};
 
 class Chassis {
     public:
         Chassis(struct Core* core);
-        Chassis(struct Core* core, std::shared_ptr<Odom> odom);
-        Chassis(struct Core* core, std::shared_ptr<Odom> odom, float pursuit_Tp, float pursuit_Ti, float pursuit_Td);
+        Chassis(struct Core* core, std::shared_ptr<Odom> odom, PursuitMode pursuit_mode = PursuitMode::PID_PURE_PURSUIT);
         ~Chassis();
         void setBrakeMode(AbstractMotor::brakeMode brake_mode);
+
+        // only for PID pursuit mode
+        void set_pursuit_pid_constant(float pursuit_Tp, float pursuit_Ti, float pursuit_Td);
 
         // basic movement functions
         void moveVelocity(float vel);
@@ -39,6 +48,7 @@ class Chassis {
         void auto_aim();
         std::shared_ptr<Odom> odom;
     private:
+        PursuitMode pursuit_mode;
         // translational PID constants
         float Tp = 5;
         float Ti = 0.015;
@@ -55,7 +65,7 @@ class Chassis {
         float Dd = 200;
 
         struct Core* core;
-        PurePursuit pure_pursuit;
+        Pursuit* pursuit;
         std::unique_ptr<Vision> vision {nullptr};
         bool odom_enabled;
         AbstractMotor::gearset motor_gearset;

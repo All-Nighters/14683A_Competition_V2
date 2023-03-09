@@ -1,17 +1,13 @@
 #include "main.h"
 
-Intake::Intake() {
-
-}
-
 Intake::Intake(struct Core* core) {
     this->core = core;
-    printf("finished intake\n");
+    printf("[Intake]: Intake created\n");
 }
 
 Intake::~Intake() {
     this->turn_off();
-    printf("intake destroyed\n");
+    printf("[Intake]: Intake destroyed\n");
 }
 void Intake::turn_on() {
     if (this->core->catapult_load_sensor->get_value() == 1) {

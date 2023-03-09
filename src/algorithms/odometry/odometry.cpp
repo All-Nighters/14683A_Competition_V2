@@ -18,13 +18,13 @@ Odom::Odom(struct Core* core, OdomMode mode) {
     this->tare_sensors();
     
     odom_task = std::move(std::make_unique<pros::Task>(this->start_odom, this, "Odom"));
-    printf("Odom created\n");
+    printf("[Odometry]: Odom created\n");
 }
 
 Odom::~Odom() {
     odom_task->remove();
     odom_task.reset(nullptr);
-    printf("Odom destroyed\n");
+    printf("[Odometry]: Odom destroyed\n");
 }
 
 void Odom::start_odom(void* iparam){
@@ -161,7 +161,7 @@ void Odom::setState(float x, float y, float angle) {
  * It should be ran with a separate task
  */
 void Odom::position_tracking() {
-    printf("Position tracking started\n");
+    printf("[Odometry]: Position tracking started\n");
     while(1) {
         // get position values
         switch (this->odometry_mode) {
@@ -169,7 +169,7 @@ void Odom::position_tracking() {
                 this->LPos = this->core->middle_tracking_wheel->get();
                 this->RPos = this->core->middle_tracking_wheel->get();
                 if (DEBUG) {
-                    printf("Encoder: L=%f, R=%f Rot=%f\n", this->LPos, this->RPos, (this->core->imu_first->get_rotation() + this->core->imu_second->get_rotation()) / 2);
+                    printf("[Odometry]: Encoder: L=%f, R=%f Rot=%f\n", this->LPos, this->RPos, (this->core->imu_first->get_rotation() + this->core->imu_second->get_rotation()) / 2);
                 }
                 break;
             case OdomMode::MOTOR_IMU:
@@ -183,7 +183,7 @@ void Odom::position_tracking() {
                               this->core->chassis_right_back->getPosition()) / 3.0
                                * Constants::Robot::EXTERNAL_GEAR_RATIO;
                 if (DEBUG) {
-                    printf("Encoder: L=%f, R=%f\n", this->LPos, this->RPos);
+                    printf("[Odometry]: Encoder: L=%f, R=%f\n", this->LPos, this->RPos);
                 }
                 break;
             case OdomMode::MOTOR_FRONTTW_IMU:
@@ -198,21 +198,21 @@ void Odom::position_tracking() {
                                * Constants::Robot::EXTERNAL_GEAR_RATIO;
                 this->SPos = this->core->front_tracking_wheel->get();
                 if (DEBUG) {
-                    printf("Encoder: L=%f, R=%f, S=%f\n", this->LPos, this->RPos, this->SPos);
+                    printf("[Odometry]: Encoder: L=%f, R=%f, S=%f\n", this->LPos, this->RPos, this->SPos);
                 }
                 break;
             case OdomMode::LEFTTW_FRONTTW_IMU:
                 this->LPos = this->core->left_tracking_wheel->get();
                 this->SPos = this->core->front_tracking_wheel->get();
                 if (DEBUG) {
-                    printf("Encoder: L=%f, S=%f\n", this->LPos, this->SPos);
+                    printf("[Odometry]: Encoder: L=%f, S=%f\n", this->LPos, this->SPos);
                 }
                 break;
             case OdomMode::RIGHTTW_FRONTTW_IMU:
                 this->RPos = this->core->right_tracking_wheel->get();
                 this->SPos = this->core->front_tracking_wheel->get();
                 if (DEBUG) {
-                    printf("Encoder: R=%f, S=%f\n", this->RPos, this->SPos);
+                    printf("[Odometry]: Encoder: R=%f, S=%f\n", this->RPos, this->SPos);
                 }
                 break;
 
@@ -229,7 +229,7 @@ void Odom::position_tracking() {
                               * Constants::Robot::EXTERNAL_GEAR_RATIO;
                 this->SPos = this->core->back_tracking_wheel->get();
                 if (DEBUG) {
-                    printf("Encoder: L=%f, R=%f, S=%f\n", this->LPos, this->RPos, this->SPos);
+                    printf("[Odometry]: Encoder: L=%f, R=%f, S=%f\n", this->LPos, this->RPos, this->SPos);
                 }
                 break;
             case OdomMode::LEFTTW_BACKTW_IMU:
@@ -237,7 +237,7 @@ void Odom::position_tracking() {
                 this->LPos = this->core->left_tracking_wheel->get();
                 this->SPos = this->core->back_tracking_wheel->get();
                 if (DEBUG) {
-                    printf("Encoder: L=%f, S=%f\n", this->LPos, this->SPos);
+                    printf("[Odometry]: Encoder: L=%f, S=%f\n", this->LPos, this->SPos);
                 }
                 break;
             case OdomMode::RIGHTTW_BACKTW_IMU:
@@ -245,7 +245,7 @@ void Odom::position_tracking() {
                 this->RPos = this->core->right_tracking_wheel->get();
                 this->SPos = this->core->back_tracking_wheel->get();
                 if (DEBUG) {
-                    printf("Encoder: R=%f, S=%f\n", this->RPos, this->SPos);
+                    printf("[Odometry]: Encoder: R=%f, S=%f\n", this->RPos, this->SPos);
                 }
                 break;
         }
@@ -337,7 +337,7 @@ void Odom::position_tracking() {
         this->position.x_pct   = this->xPosGlobal / Constants::Field::FIELD_LENGTH * 100;
         this->position.y_pct   = this->yPosGlobal / Constants::Field::FIELD_LENGTH * 100;
         this->position.theta   = this->currentAbsoluteOrientation * 180 / M_PI;
-        printf("%f %f %f\n", this->position.x_pct, this->position.y_pct, this->position.theta);
+        // printf("[Odometry]: %f %f %f\n", this->position.x_pct, this->position.y_pct, this->position.theta);
 
         pros::delay(10);
 

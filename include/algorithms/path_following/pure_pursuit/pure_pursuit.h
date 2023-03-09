@@ -1,13 +1,15 @@
 #pragma once
+#include "algorithms/path_following/pursuit.h"
 
-class PurePursuit {
+
+class PurePursuit : public Pursuit {
     public:
         PurePursuit(float max_velocity = 300);
         PurePursuit(std::vector<Coordinates> input_path, float max_velocity = 300);
         PurePursuit(float Tp, float Ti, float Td, float max_velocity = 300);
-        bool is_arrived();
-        void set_path(std::vector<Coordinates> input_path);
-        ChassisVelocityPair step(RobotPosition position, bool reverse = false);
+        bool is_arrived() override;
+        void set_path(std::vector<Coordinates> input_path) override;
+        ChassisVelocityPair step(RobotPosition position, bool reverse = false) override;
     private:
         bool arrived;
         float look_ahead_radius;

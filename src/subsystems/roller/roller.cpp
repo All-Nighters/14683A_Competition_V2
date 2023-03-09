@@ -6,12 +6,12 @@ Roller::Roller() {
 
 Roller::Roller(struct Core* core) {
     this->core = core;
-    printf("finished roller\n");
+    printf("[Roller]: Roller created\n");
 }
 
 Roller::~Roller() {
     this->core->roller->moveVoltage(0);
-    printf("roller destroyed\n");
+    printf("Roller destroyed\n");
 }
 
 void Roller::rollto(RollerDirection direction) {

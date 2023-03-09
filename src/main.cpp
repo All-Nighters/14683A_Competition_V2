@@ -72,7 +72,7 @@ void initialize()
 	core.imu_second->reset(true);
 	// cata = std::make_shared<Catapult>(&core);
 	GraphicalInterface interface;
-	printf("Interface started\n");
+	printf("[Main]: Interface started\n");
 	pros::delay(1000);
 }
 
@@ -113,7 +113,7 @@ void competition_initialize() {}
  */
 void autonomous()
 {
-
+	printf("[Main]: Autonomous started\n");
 	GraphicalInterface::InterfaceSelector position = GraphicalInterface::get_selector(GraphicalInterface::InterfaceConfiguration::GAME_POSITION);
 	GraphicalInterface::InterfaceSelector game_team = GraphicalInterface::get_selector(GraphicalInterface::InterfaceConfiguration::GAME_TEAM);
 	GraphicalInterface::InterfaceSelector mode = GraphicalInterface::get_selector(GraphicalInterface::InterfaceConfiguration::GAME_MODE);
@@ -135,7 +135,7 @@ void autonomous()
 	{
 		AutonFirstScoring auton = AutonFirstScoring(&core, cata, position_offset);
 		auton.run();
-		printf("#1 score, offset %d\n", position_offset);
+		printf("[Main]: #1 score, offset %d\n", position_offset);
 	}
 	// second position scoring mode
 	else if (position == GraphicalInterface::InterfaceSelector::SELECTOR_POSITION_2 &&
@@ -143,7 +143,7 @@ void autonomous()
 	{
 		AutonSecondScoring auton = AutonSecondScoring(&core, cata, position_offset);
 		auton.run();
-		printf("#2 score, offset %d\n", position_offset);
+		printf("[Main]: #2 score, offset %d\n", position_offset);
 	}
 	// fist position support mode (WP)
 	else if (position == GraphicalInterface::InterfaceSelector::SELECTOR_POSITION_1 &&
@@ -151,12 +151,12 @@ void autonomous()
 	{
 		AutonFirstSupport auton = AutonFirstSupport(&core, cata, position_offset);
 		auton.run();
-		printf("#1 support, offset %d\n", position_offset);
+		printf("[Main]: #1 support, offset %d\n", position_offset);
 	}
 	// idle mode
 	else if (mode == GraphicalInterface::InterfaceSelector::SELECTOR_MODE_IDLE)
 	{
-		printf("idle\n");
+		printf("[Main]: idle\n");
 		;
 	}
 }
@@ -175,9 +175,30 @@ void autonomous()
  */
 void opcontrol()
 {
+	printf("[Main]: Opcontrol started\n");
+	// std::vector<Coordinates> ctlpoint = {
+	// 	Coordinates(10.030533885227815, 17.933841152045563, 0),
+	// 	Coordinates(17.81679342721255, 17.933841152045563, 0),
+	// 	Coordinates(44.992365946296516, 28.010177029908156, 0),
+	// 	Coordinates(30.183205640953005, 42.81933733525167, 0),
+	// 	Coordinates(38.27480869438812, 53.81170374746541, 0),
+	// 	Coordinates(49.72519037377744, 44.95674191540434, 0),
+	// 	Coordinates(66.21373999209804, 50.6055968772364, 0),
+	// 	Coordinates(50.3358773966782, 66.17811596120586, 0),
+	// 	Coordinates(49.877862129502624, 82.36132206807609, 0),
+	// 	Coordinates(66.51908350354843, 66.63613122838144, 0),
+	// 	Coordinates(81.9389308317927, 81.75063504517534, 0),
+	// 	Coordinates(90.79389266385377, 91.52162741158754, 0),
+	// };
+
+	// CatmullRom catmull = CatmullRom(ctlpoint);
+	// std::vector<Coordinates> path = catmull.get_processed_coordinates();
 	std::shared_ptr<Odom> odometry = std::make_shared<Odom>(&core, OdomMode::MOTOR_IMU);
+	odometry->setState(17.81679342721255, 17.933841152045563, 0);
 	Chassis chassis = Chassis(&core, odometry);
 	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
+
+	// chassis.followPath(path);
 	while (true)
 	{
 		chassis.cheezyDrive(core.controller->getAnalog(Configuration::Controls::FORWARD_AXIS), core.controller->getAnalog(Configuration::Controls::TURN_AXIS));

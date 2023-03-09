@@ -8,7 +8,8 @@
  */
 Chassis::Chassis(struct Core* core) {
     this->core = core;
-    this->pure_pursuit = PurePursuit(600);
+    this->pursuit_mode = PursuitMode::PID_PURE_PURSUIT;
+    this->pursuit = new PurePursuit(600);
     this->odom_enabled = false;
     this->motor_gearset = AbstractMotor::gearset::blue;
     this->maximum_velocity = 600;
@@ -20,7 +21,7 @@ Chassis::Chassis(struct Core* core) {
     vision_signatures.push_back(Constants::RED_SIG);
     vision_signatures.push_back(Constants::BLUE_SIG);
     this->vision->set_signatures(vision_signatures);
-    printf("Chassis created\n");
+    printf("[Chassis]: Chassis created\n");
 }
 
 /**
@@ -29,9 +30,8 @@ Chassis::Chassis(struct Core* core) {
  * @param core Core structure pointer
  * @param odom Odom structure pointer
  */
-Chassis::Chassis(struct Core* core, std::shared_ptr<Odom> odom) {
+Chassis::Chassis(struct Core* core, std::shared_ptr<Odom> odom, PursuitMode pursuit_mode) {
     this->core = core;
-    this->pure_pursuit = PurePursuit(600);
     this->odom = odom;
     this->odom_enabled = true;
     this->motor_gearset = AbstractMotor::gearset::blue;
@@ -39,30 +39,26 @@ Chassis::Chassis(struct Core* core, std::shared_ptr<Odom> odom) {
     this->imu1 = core->imu_first;
     this->imu2 = core->imu_second;
     this->vision = std::move(std::make_unique<Vision>(core));
+    this->pursuit_mode = pursuit_mode;
+    if (pursuit_mode == PursuitMode::PID_PURE_PURSUIT) {
+        this->pursuit = new PurePursuit(600);
+    }  else {
+        this->pursuit = new PurePursuit(600);
+    }
     // signatures
     std::vector<pros::vision_signature_s_t> vision_signatures;
     vision_signatures.push_back(Constants::RED_SIG);
     vision_signatures.push_back(Constants::BLUE_SIG);
     this->vision->set_signatures(vision_signatures);
-    printf("finished chassis\n");
+    printf("[Chassis]: Chassis created\n");
 }
 
-Chassis::Chassis(struct Core* core, std::shared_ptr<Odom> odom, float pursuit_Tp, float pursuit_Ti, float pursuit_Td) {
-    this->core = core;
-    this->pure_pursuit = PurePursuit(pursuit_Tp, pursuit_Ti, pursuit_Td, 600);
-    this->odom = odom;
-    this->odom_enabled = true;
-    this->motor_gearset = AbstractMotor::gearset::blue;
-    this->maximum_velocity = 600;
-    this->imu1 = core->imu_first;
-    this->imu2 = core->imu_second;
-    this->vision = std::move(std::make_unique<Vision>(core));
-    // signatures
-    std::vector<pros::vision_signature_s_t> vision_signatures;
-    vision_signatures.push_back(Constants::RED_SIG);
-    vision_signatures.push_back(Constants::BLUE_SIG);
-    this->vision->set_signatures(vision_signatures);
-    printf("finished chassis\n");
+void Chassis::set_pursuit_pid_constant(float pursuit_Tp, float pursuit_Ti, float pursuit_Td) {
+    if (this->pursuit_mode == PursuitMode::PID_PURE_PURSUIT) {
+        this->pursuit = new PurePursuit(pursuit_Tp, pursuit_Ti, pursuit_Td, 600);
+    } else {
+        printf("[Chassis]: Nothing changed, pursuit mode not PID\n");
+    }
 }
 
 /**
@@ -71,7 +67,7 @@ Chassis::Chassis(struct Core* core, std::shared_ptr<Odom> odom, float pursuit_Tp
  */
 Chassis::~Chassis() {
     this->moveVelocity(0);
-    printf("Chassis destroyed\n");
+    printf("[Chassis]: Chassis destroyed\n");
 }
 
 /**
@@ -268,7 +264,7 @@ void Chassis::turnAngle(float angle) {
 
 void Chassis::faceAngle(float angle) {
     if (!this->odom_enabled) { // odometry not configured
-        printf("Cannot run faceAngle because odometry is not enabled\n");
+        printf("[Chassis]: Cannot run faceAngle because odometry is not enabled\n");
         return;
     }
     RobotPosition robot_state = this->odom->getState();
@@ -281,7 +277,7 @@ void Chassis::faceAngle(float angle) {
         robot_state = this->odom->getState();
 
         float error = Math::format_angle(target_angle) - Math::format_angle(robot_state.theta);
-        printf("%f\n", error);
+        printf("%[Chassis]: f\n", error);
         float deriv_error = error - prev_error;
 
         float control_output = Math::clamp(error * this->Rp + deriv_error * this->Rd, -12000, 12000);
@@ -309,7 +305,7 @@ void Chassis::faceAngle(float angle) {
  */
 void Chassis::faceCoordinate(float xPercent, float yPercent, float angle_offset) {
     if (!this->odom_enabled) { // odometry not configured
-        printf("Cannot run faceAngle because odometry is not enabled\n");
+        printf("[Chassis]: Cannot run faceCoordinate because odometry is not enabled\n");
         return;
     }
 
@@ -409,12 +405,12 @@ void Chassis::simpleMoveToPointBackwards(float xPercent, float yPercent, float m
  * @param enable_disk_pursuit whether the robot should pursue nearby disks
  */
 void Chassis::followPath(std::vector<Coordinates> path, bool reverse) {
-    this->pure_pursuit.set_path(path);
+    this->pursuit->set_path(path);
     
-    while (!this->pure_pursuit.is_arrived()) {
+    while (!this->pursuit->is_arrived()) {
         RobotPosition position = this->odom->getState();
         ChassisVelocityPair velocity_pair;
-        velocity_pair = this->pure_pursuit.step(position, reverse);
+        velocity_pair = this->pursuit->step(position, reverse);
         this->moveVelocity(velocity_pair.left_v, velocity_pair.right_v);
         pros::delay(10);
     }
@@ -562,8 +558,6 @@ void Chassis::auto_aim() {
             control_output = 1000;
         }
     }
-
-    printf("%f\n", angle);
 
     prev_error = error;
 

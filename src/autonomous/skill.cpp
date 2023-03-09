@@ -3,7 +3,8 @@
 Skill::Skill(struct Core* core, std::shared_ptr<Catapult> cata, bool offset) {
     this->odometry    = std::make_shared<Odom>(core, OdomMode::MIDDLETW_IMU);
     this->catapult_ptr = cata;
-    this->chassis_ptr = std::make_unique<Chassis>(core, this->odometry, 350, 1, 500);
+    this->chassis_ptr = std::make_unique<Chassis>(core, this->odometry);
+    this->chassis_ptr->set_pursuit_pid_constant(380, 1, 550);
     this->intake_ptr = std::make_unique<Intake>(core);
     this->roller_ptr = std::make_unique<Roller>(core);
     this->expansion_ptr = std::make_unique<Expansion>(core);

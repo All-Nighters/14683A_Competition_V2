@@ -1,16 +1,19 @@
 #include "main.h"
-#include "algorithms/pure_pursuit/pure_pursuit.h"
+#include "algorithms/path_following/pursuit.h"
+#include "algorithms/path_following/pure_pursuit/pure_pursuit.h"
 
 /**
  * @brief Construct a new Pure Pursuit:: Pure Pursuit object
  * 
  * @param max_velocity maximum path following velocity
  */
-PurePursuit::PurePursuit(float max_velocity) {
+PurePursuit::PurePursuit(float max_velocity) : Pursuit(max_velocity) {
     this->max_velocity = max_velocity;
     this->look_ahead_radius = Constants::PurePursuit::LOOKAHEAD_RADIUS;
+    this->arrived = false;
 
     this->init();
+    printf("[Pure Pursuit]: Pure_pursuit created\n");
 }
 
 /**
@@ -19,7 +22,7 @@ PurePursuit::PurePursuit(float max_velocity) {
  * @param input_path path to follow
  * @param max_velocity maximum path following velocity
  */
-PurePursuit::PurePursuit(std::vector<Coordinates> input_path, float max_velocity) {
+PurePursuit::PurePursuit(std::vector<Coordinates> input_path, float max_velocity) : Pursuit(max_velocity) {
     this->max_velocity = max_velocity;
     this->look_ahead_radius = Constants::PurePursuit::LOOKAHEAD_RADIUS;
     this->arrived = false;
@@ -27,6 +30,7 @@ PurePursuit::PurePursuit(std::vector<Coordinates> input_path, float max_velocity
         this->path.push_back(point);
     }
     this->init();
+    printf("[Pure Pursuit]: Pure_pursuit created\n");
 }
 
 /**
@@ -35,11 +39,12 @@ PurePursuit::PurePursuit(std::vector<Coordinates> input_path, float max_velocity
  * @param input_path path to follow
  * @param max_velocity maximum path following velocity
  */
-PurePursuit::PurePursuit(float Tp, float Ti, float Td, float max_velocity) {
+PurePursuit::PurePursuit(float Tp, float Ti, float Td, float max_velocity) : Pursuit(max_velocity) {
     this->max_velocity = max_velocity;
     this->look_ahead_radius = Constants::PurePursuit::LOOKAHEAD_RADIUS;
 
     this->init(Tp, Ti, Td);
+    printf("[Pure Pursuit]: Pure_pursuit created\n");
 }
 
 /**
@@ -97,6 +102,7 @@ bool PurePursuit::is_arrived() {
  * @param input_path path to follow
  */
 void PurePursuit::set_path(std::vector<Coordinates> input_path) {
+    printf("[Pure Pursuit]: path set\n");
     this->arrived = false;
     this->path.clear();
     for (Coordinates point : input_path) {

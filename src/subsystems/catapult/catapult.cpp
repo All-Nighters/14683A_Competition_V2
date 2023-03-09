@@ -19,7 +19,7 @@ Catapult::Catapult(struct Core* core) {
     this->core->catapult_motor->setBrakeMode(okapi::AbstractMotor::brakeMode::hold);
     this->shooting_task = std::move(std::make_unique<pros::Task>(this->shooting_loop_trampoline, this, "shooting loop"));
     Catapult::continue_shooting = true;
-    printf("finished cata %d\n", Catapult::continue_shooting);
+    printf("[Catapult]: Catapult created\n");
 }
 /**
  * @brief Destroy the Catapult:: Catapult object
@@ -32,7 +32,7 @@ Catapult::~Catapult() {
     this->shooting_task.reset(nullptr);
     this->core->catapult_motor->moveVoltage(0);
     this->core->piston_booster->set_value(false);
-    printf("Catapult destroyed %d\n", continue_shooting);
+    printf("[Catapult]: Catapult created\n");
 }
 
 void Catapult::set_voltage(int voltage) {
