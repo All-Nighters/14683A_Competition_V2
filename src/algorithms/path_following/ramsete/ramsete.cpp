@@ -87,14 +87,14 @@ ChassisVelocityPair Ramsete::step(RobotPosition position, bool reverse) {
         Waypoint look_ahead = this->path[this->closest(position)];
         Waypoint local_look_ahead = this->absToLocal(position, look_ahead);
 
-        float e_x = local_look_ahead.get_x();
-        float e_y = reverse ? -local_look_ahead.get_y() : local_look_ahead.get_y();
+        float e_x = reverse ? -local_look_ahead.get_x() : local_look_ahead.get_x();
+        float e_y = local_look_ahead.get_y();
         float e_theta = 
             reverse ? Math::format_angle(180 + local_look_ahead.get_direction() - position.theta) 
                     : Math::format_angle(local_look_ahead.get_direction() - position.theta);
 
         float desired_linvel = look_ahead.get_linear_vel();
-        float desired_angvel = std::fmin(std::fmax(0.1*abs(e_theta), 0), M_PI/2);
+        float desired_angvel = look_ahead.get_ang_vel();
         float k = 2 * this->zeta * sqrt(desired_angvel * desired_angvel + this->b * desired_linvel * desired_linvel);
 
         float target_linvel = desired_linvel * cos(e_theta) + k * e_y;
@@ -103,13 +103,8 @@ ChassisVelocityPair Ramsete::step(RobotPosition position, bool reverse) {
         if (e_theta != 0) {
             target_angvel = desired_angvel + k * e_theta + (this->b*desired_linvel*sin(e_theta)* e_x) / e_theta;
         }
-        if (reverse) {
-            velocity_pair.left_v = -(target_linvel + target_angvel);
-            velocity_pair.right_v = -(target_linvel - target_angvel);
-        } else {
-            velocity_pair.left_v = target_linvel + target_angvel;
-            velocity_pair.right_v = target_linvel - target_angvel;
-        }
+        velocity_pair.left_v = target_linvel + target_angvel;
+        velocity_pair.right_v = target_linvel - target_angvel;
     }
     return velocity_pair;
 }
