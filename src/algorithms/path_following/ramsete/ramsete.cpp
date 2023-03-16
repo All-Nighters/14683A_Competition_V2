@@ -24,6 +24,29 @@ Ramsete::Ramsete(std::vector<Waypoint> input_path, float max_velocity) : Pursuit
 }
 
 /**
+ * @brief Find the index number of the closest waypoint to the robot
+ * 
+ * @param position robot position
+ * @returns index 
+ */
+int Ramsete::closest(RobotPosition position) {
+    float x_dist = this->path[0].get_x() - position.x_pct;
+    float y_dist = this->path[0].get_y() - position.y_pct;
+    float min_distance = sqrt(x_dist * x_dist + y_dist * y_dist);
+    int min_idx = 0;
+    for (int i = 1; i < this->path.size(); i++) {
+        x_dist = this->path[i].get_x() - position.x_pct;
+        y_dist = this->path[i].get_y() - position.y_pct;
+        float dist = sqrt(x_dist * x_dist + y_dist * y_dist);
+        if (dist <= min_distance) {
+            min_distance = dist;
+            min_idx = i;
+        }
+    }
+    return min_idx;
+}
+
+/**
  * @brief Check if the robot has reached the destination
  * 
  * @return true 
@@ -36,10 +59,10 @@ bool Ramsete::is_arrived() {
 /**
  * @brief Set the path to follow
  * 
- * @param input_path path to follow
+ * @param input_waypoint path to follow
  */
-void Ramsete::set_path(std::vector<Waypoint> input_path) {
-    this->path = input_path;
+void Ramsete::set_waypoint(std::vector<Waypoint> input_waypoint) {
+    this->path = input_waypoint;
     this->arrived = false;
 }
 
@@ -70,7 +93,7 @@ Waypoint Ramsete::absToLocal(RobotPosition position, Waypoint point) {
     float newX = yDist*cos(position.theta*M_PI/180.0) - xDist*sin(position.theta*M_PI/180.0);
     float newY = yDist*sin(position.theta*M_PI/180.0) + xDist*cos(position.theta*M_PI/180.0);
 
-    return Waypoint(newX, newY, position.theta, point.get_linear_vel(), point.get_ang_vel());
+    return Waypoint(newX, newY, point.get_direction(), point.get_linear_vel(), point.get_ang_vel());
 }
 
 /**
@@ -97,14 +120,20 @@ ChassisVelocityPair Ramsete::step(RobotPosition position, bool reverse) {
         float desired_angvel = look_ahead.get_ang_vel();
         float k = 2 * this->zeta * sqrt(desired_angvel * desired_angvel + this->b * desired_linvel * desired_linvel);
 
-        float target_linvel = desired_linvel * cos(e_theta) + k * e_y;
+        float target_linvel = desired_linvel * cos(e_theta * pi / 180) + k * e_y;
         float target_angvel;
 
         if (e_theta != 0) {
             target_angvel = desired_angvel + k * e_theta + (this->b*desired_linvel*sin(e_theta)* e_x) / e_theta;
         }
+        
         velocity_pair.left_v = target_linvel + target_angvel;
         velocity_pair.right_v = target_linvel - target_angvel;
+    } else {
+        velocity_pair.left_v = 0;
+        velocity_pair.right_v = 0;
+
+        this->arrived = true;
     }
     return velocity_pair;
 }

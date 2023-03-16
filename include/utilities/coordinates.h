@@ -32,7 +32,7 @@ private:
 	float ang_vel;
 
 public:
-	Waypoint(float x_coordinates, float y_coordinates, float lin_vel, float direction = 0, float ang_vel = 0);
+	Waypoint(float x_coordinates, float y_coordinates, float direction = 0, float lin_vel = 0, float ang_vel = 0);
 	float get_linear_vel();
 	float get_ang_vel();
 };

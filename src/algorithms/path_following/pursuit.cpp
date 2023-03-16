@@ -10,6 +10,10 @@ bool Pursuit::is_arrived() {
 void Pursuit::set_path(std::vector<Coordinates> input_path) {
 
 }
+
+void Pursuit::set_waypoint(std::vector<Waypoint> input_waypoint) {
+
+}
 ChassisVelocityPair Pursuit::step(RobotPosition position, bool reverse) {
     ChassisVelocityPair pair = ChassisVelocityPair();
     pair.left_v = 0;

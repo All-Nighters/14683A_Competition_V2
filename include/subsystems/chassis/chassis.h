@@ -1,5 +1,6 @@
 #include "algorithms/path_following/pursuit.h"
 #include "algorithms/path_following/pure_pursuit/pure_pursuit.h"
+#include "algorithms/path_following/ramsete/ramsete.h"
 
 using namespace okapi;
 
@@ -34,6 +35,7 @@ class Chassis {
         void simpleMoveToPointBackwards(float x, float y, float max_voltage = 5000, bool turn_on_intake = false);
 
         void followPath(std::vector<Coordinates> path, bool reverse = false);
+        void followPath(std::vector<Waypoint> path, bool reverse = false);
 
         // position sensing functions
         float getLeftPosition();

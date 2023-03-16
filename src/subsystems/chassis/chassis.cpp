@@ -42,7 +42,11 @@ Chassis::Chassis(struct Core* core, std::shared_ptr<Odom> odom, PursuitMode purs
     this->pursuit_mode = pursuit_mode;
     if (pursuit_mode == PursuitMode::PID_PURE_PURSUIT) {
         this->pursuit = new PurePursuit(600);
-    }  else {
+    }  
+    else if (pursuit_mode == PursuitMode::RAMSETE) {
+        this->pursuit = new Ramsete(600);
+    }
+    else {
         this->pursuit = new PurePursuit(600);
     }
     // signatures
@@ -417,6 +421,27 @@ void Chassis::followPath(std::vector<Coordinates> path, bool reverse) {
     this->moveVelocity(0);
 
 }
+
+/**
+ * @brief Follow a path
+ * 
+ * @param path path
+ * @param reverse whether the robot should move backwards to pursue the path
+ * @param enable_disk_pursuit whether the robot should pursue nearby disks
+ */
+void Chassis::followPath(std::vector<Waypoint> path, bool reverse) {
+    this->pursuit->set_waypoint(path);
+    while (!this->pursuit->is_arrived()) {
+        RobotPosition position = this->odom->getState();
+        ChassisVelocityPair velocity_pair;
+        velocity_pair = this->pursuit->step(position, reverse);
+        this->moveVelocity(velocity_pair.left_v, velocity_pair.right_v);
+        pros::delay(10);
+    }
+    this->moveVelocity(0);
+
+}
+
 
 /**
  * @brief Get left track motor position reading
